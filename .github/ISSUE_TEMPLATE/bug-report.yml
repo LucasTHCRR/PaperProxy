@@ -1,69 +1,112 @@
 name: Bug Report
-description: Report issues with Velocity not working properly.
+description: Something in PaperProxy does not work as it should.
 labels: ["type: bug"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing PaperProxy. The more of the fields below you fill in, the faster a bug can be reproduced and fixed.
+        Security problems please not here, see [SECURITY.md](https://github.com/OPaperStream/PaperProxy/blob/main/SECURITY.md).
+
   - type: textarea
     attributes:
-      label: Expected Behavior
-      description: What you expected to work and how.
+      label: PaperProxy Version
+      description: |
+        The output of `/paperproxy` in the console. *"Latest"* is not a version; please paste the text, not a screenshot.
+      placeholder: |
+        PaperProxy 1.2.2-RELEASE
+        Based on Velocity 4.2.1-SNAPSHOT (7fc4991)
+      render: text
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Which part of PaperProxy is affected?
+      multiple: true
+      options:
+        - A BungeeCord plugin
+        - A Velocity plugin
+        - Forwarding / PaperGuard
+        - Server groups, queue, /hub or limbo
+        - Parties
+        - Bans, mutes, kicks
+        - Network sync (Redis)
+        - Updates
+        - Configuration or messages
+        - Something else
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: Actual Behavior
-      description: What actually happens.
+      label: Plugins and Versions
+      description: |
+        The output of `/paperproxy plugin list` (Velocity and BungeeCord plugins with versions), and `/plugins` on the affected backend server.
+        For a plugin problem, please also say where you downloaded the plugin.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Backend Servers
+      description: Software and version of the backend servers involved, and the client version.
+      placeholder: "Paper 1.21.4 build 232, Purpur 26.1.2, client 26.1.2 with ViaVersion"
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: Steps to Reproduce
-      description: Information on how we can reproduce this bug on our own, this can be e.g. just an explanation, a video or your Velocity config.
+      description: Exactly what you did, one step per line, from a fresh start of the proxy if possible.
+      placeholder: |
+        1. Start the proxy with the plugins above
+        2. Join lobby-1
+        3. Run /party invite Steve
+        4. ...
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: Plugin List
+      label: Expected Behavior
+      description: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Logs
       description: |
-        All plugins running on your proxy and the backend server you're experiencing this issue on.
-        Use `/velocity plugins` to list plugins on Velocity and `/plugins` to list plugins on your backend server.
-    validations:
-      required: true
-
-  - type: textarea
-    attributes:
-      label: Velocity Version
-      description: |
-        The full, unmodified output of running `/velocity info`.
-        *"Latest"* is not a version. We require you to paste the text, not a screenshot.
-        <details>
-        <summary>Example</summary>
-        
-        ```
-        [17:44:10 INFO]: Velocity 3.3.0-SNAPSHOT (git-9d25d309-b400)  
-        [17:44:10 INFO]: Copyright 2018-2023 Velocity Contributors. Velocity is licensed under the terms of the GNU General Public License v3.  
-        [17:44:10 INFO]: PaperMC - GitHub  
-        ```
-        </details>
-    validations:
-      required: true
-
-  - type: textarea
-    attributes:
-      label: Additional Information
-      description: Anything else you think is helpful.
+        The proxy log around the problem, with the full stack trace if there is one (`logs/latest.log`).
+        For long logs please use [mclo.gs](https://mclo.gs) and paste the link. Remove IP addresses if you like.
+      render: text
     validations:
       required: false
 
-  - type: markdown
+  - type: textarea
     attributes:
-      value: |
-        Before submitting this issue, please ensure the following:
+      label: Configuration
+      description: Relevant parts of `paperproxy.toml` or `velocity.toml`. **Remove secrets** (forwarding secret, Redis password, webhook URL, sync.secret).
+      render: toml
+    validations:
+      required: false
 
-        1. You are running the latest version of Velocity from [our downloads page](https://papermc.io/downloads/velocity).
-        2. You searched for and ensured there isn't already an open issue regarding this.
-
-        If you think you have a bug, but are not sure, feel free to ask in the `#velocity-help` channel on our
-        [Discord](https://discord.gg/papermc).
+  - type: checkboxes
+    attributes:
+      label: Checks
+      options:
+        - label: I am running the [latest release](https://github.com/OPaperStream/PaperProxy/releases/latest).
+          required: true
+        - label: I searched the issues and this has not been reported yet.
+          required: true
+        - label: For a BungeeCord plugin, I checked it with the [Plugin Checker](https://opaperstream.github.io/PaperProxy/).
+          required: false

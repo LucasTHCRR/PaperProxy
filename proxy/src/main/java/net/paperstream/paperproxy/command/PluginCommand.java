@@ -118,20 +118,26 @@ final class PluginCommand {
   }
 
   private static int list(final VelocityServer server, final CommandContext<CommandSource> ctx) {
-    final List<String> velocity = server.getPluginManager().getPlugins().stream()
+    // Name to "Name version"; versions make bug reports useful.
+    final java.util.Map<String, String> labels = new java.util.LinkedHashMap<>();
+    server.getPluginManager().getPlugins().stream()
         .map(PluginContainer::getDescription)
         .filter(d -> !d.getId().equals("velocity") && !d.getId().equals("paperproxy-bungee"))
-        .map(d -> d.getName().orElse(d.getId()))
-        .toList();
+        .forEach(d -> {
+          final String name = d.getName().orElse(d.getId());
+          labels.put(name, d.getVersion().map(v -> name + " " + v).orElse(name));
+        });
     final BungeeLayerHandle bungee = server.getBungeeLayer();
     final List<String> bungeePlugins = bungee == null ? List.of() : bungee.pluginNames();
     // Bungee plugins are registered as Velocity containers too; list them only once.
-    final List<String> onlyVelocity = velocity.stream()
-        .filter(n -> !bungeePlugins.contains(n)).toList();
+    final List<String> onlyVelocity = labels.keySet().stream()
+        .filter(n -> !bungeePlugins.contains(n)).map(labels::get).toList();
+    final List<String> bungeeLabels = bungeePlugins.stream()
+        .map(n -> labels.getOrDefault(n, n)).toList();
     ctx.getSource().sendMessage(Component.translatable("paperproxy.plugin.list",
         Argument.string("velocity", onlyVelocity.isEmpty() ? "-" : String.join(", ", onlyVelocity)),
-        Argument.string("bungee", bungeePlugins.isEmpty() ? "-"
-            : String.join(", ", bungeePlugins)),
+        Argument.string("bungee", bungeeLabels.isEmpty() ? "-"
+            : String.join(", ", bungeeLabels)),
         Argument.string("changes", String.valueOf(server.getPluginReloader().changes()))));
     return Command.SINGLE_SUCCESS;
   }

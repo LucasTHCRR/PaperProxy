@@ -11,7 +11,8 @@ Velocity and Waterfall today.
 
 **Will my plugins work?** Check them with the
 [PaperProxy Plugin Checker](https://opaperstream.github.io/PaperProxy/) (runs in your browser,
-nothing is uploaded).
+nothing is uploaded). Which plugins were tested, and how thoroughly, is listed under
+[Tested Plugins](https://github.com/OPaperStream/PaperProxy/wiki/Tested-Plugins).
 
 **Status: first release.** Everything below is implemented and tested on a test network,
 also with real clients. It is not yet proven on large production networks, so please report
