@@ -953,9 +953,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       logger.info("Shutting down the proxy...");
       discordWebhook.send(DiscordWebhook.Kind.PROXY, "paperproxy.discord.proxy-stopping");
 
-      // Shutdown the connection manager, this should be
-      // done first to refuse new connections
-      cm.shutdown();
+      // Stop accepting new connections, but keep DNS available to pre-shutdown handlers.
+      cm.closeEndpoints(true);
 
       try {
         eventManager.fire(new ProxyPreShutdownEvent())
@@ -970,6 +969,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
         Thread.currentThread().interrupt();
         logger.warn("Interrupted while waiting for ProxyPreShutdownEvent; continuing shutdown.");
       }
+
+      cm.shutdown();
 
       ImmutableList<ConnectedPlayer> players = ImmutableList.copyOf(connectionsByUuid.values());
       final InetSocketAddress transferTo = transferTarget();
