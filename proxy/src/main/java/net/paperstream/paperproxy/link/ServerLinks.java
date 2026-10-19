@@ -72,7 +72,9 @@ public final class ServerLinks {
   private final Map<String, LinkHandler> sessions = new ConcurrentHashMap<>();
   private final Map<String, Long> announced = new ConcurrentHashMap<>();
   private final Map<UUID, Move> moved = new ConcurrentHashMap<>();
-  private final Map<Integer, CompletableFuture<List<String>>> commands = new ConcurrentHashMap<>();
+  private final Map<Integer, Command> commands = new ConcurrentHashMap<>();
+  private final java.util.concurrent.atomic.AtomicBoolean restarting =
+      new java.util.concurrent.atomic.AtomicBoolean();
   private final AtomicInteger failedAttempts = new AtomicInteger();
   private final AtomicInteger nextCommand = new AtomicInteger();
 
@@ -102,6 +104,9 @@ public final class ServerLinks {
   }
 
   private record Move(String from, String to) {
+  }
+
+  private record Command(String server, CompletableFuture<List<String>> future) {
   }
 
   /**
@@ -224,10 +229,12 @@ public final class ServerLinks {
    * Uses up a pairing code once it was proven.
    *
    * @param pairing the pairing
-   * @return the name the server gets on this proxy
+   * @return the name the server gets on this proxy, or null if someone else used it first
    */
-  String claim(final Pending pairing) {
-    pending.remove(key(pairing.name()));
+  @Nullable String claim(final Pending pairing) {
+    if (!pending.remove(key(pairing.name()), pairing)) {
+      return null;
+    }
     return server.getServer(pairing.name()).map(s -> s.getServerInfo().getName())
         .orElse(pairing.name());
   }
@@ -248,7 +255,8 @@ public final class ServerLinks {
     final Linked old = links.get(key(pairing.name()));
     final boolean registered = existing.isEmpty() || (old != null && old.registered());
     final String name = existing.map(s -> s.getServerInfo().getName()).orElse(pairing.name());
-    if (registered && existing.isPresent()) {
+    if (registered && existing.isPresent() && !existing.get().getServerInfo().getAddress()
+        .equals(new InetSocketAddress(host, port))) {
       server.unregisterServer(existing.get().getServerInfo());
     }
     final Linked linked = new Linked(name, host, port, pairing.group(), linkKey, registered);
@@ -367,6 +375,11 @@ public final class ServerLinks {
       logger.info("PaperStream server {} now links from {}", linked.name(), address);
     }
     logger.info("PaperStream server {} linked", linked.name());
+    // The forwarding secret may have changed since the pairing.
+    final JsonObject secret = new JsonObject();
+    secret.addProperty("op", "secret");
+    secret.addProperty("value", forwardingSecret());
+    handler.send(secret);
   }
 
   /**
@@ -394,9 +407,12 @@ public final class ServerLinks {
       case "ready" -> returnPlayers(name);
       case "shutdown" -> shutdown(name, handler);
       case "result" -> {
-        final CompletableFuture<List<String>> future =
-            commands.remove(message.get("id").getAsInt());
-        if (future != null) {
+        final int id = message.get("id").getAsInt();
+        final Command command = commands.get(id);
+        // Only the server that got the command may answer it.
+        if (command != null && command.server().equals(key(name))) {
+          commands.remove(id);
+          final CompletableFuture<List<String>> future = command.future();
           final List<String> lines = new ArrayList<>();
           final JsonArray array = message.getAsJsonArray("lines");
           if (array != null) {
@@ -532,7 +548,7 @@ public final class ServerLinks {
     }
     final int id = nextCommand.incrementAndGet();
     final CompletableFuture<List<String>> future = new CompletableFuture<>();
-    commands.put(id, future);
+    commands.put(id, new Command(key(name), future));
     final JsonObject message = new JsonObject();
     message.addProperty("op", "exec");
     message.addProperty("id", id);
@@ -552,32 +568,44 @@ public final class ServerLinks {
    */
   public CompletableFuture<Void> rollingRestart(final List<String> names,
                                                 final RestartProgress progress) {
+    if (!restarting.compareAndSet(false, true)) {
+      progress.step("running", "");
+      return CompletableFuture.completedFuture(null);
+    }
     return CompletableFuture.runAsync(() -> {
-      for (final String name : names) {
-        final LinkHandler session = sessions.get(key(name));
-        if (session == null) {
-          progress.step("skipped", name);
-          continue;
-        }
-        progress.step("restarting", name);
-        final JsonObject message = new JsonObject();
-        message.addProperty("op", "restart");
-        session.send(message);
-        if (!waitFor(() -> sessions.get(key(name)) != session, 120)) {
-          progress.step("timeout", name);
-          return;
-        }
-        if (!waitFor(() -> sessions.containsKey(key(name)), 600)) {
-          progress.step("timeout", name);
-          return;
-        }
-        // Players of the next server can only move here once the health check agrees.
-        server.getHealthChecker().checkAll();
-        waitFor(() -> server.getHealthChecker().isOnline(name), 30);
-        progress.step("back", name);
+      try {
+        restartAll(names, progress);
+      } finally {
+        restarting.set(false);
       }
-      progress.step("done", "");
     }, runnable -> Thread.ofVirtual().name("paperproxy-rolling-restart").start(runnable));
+  }
+
+  private void restartAll(final List<String> names, final RestartProgress progress) {
+    for (final String name : names) {
+      final LinkHandler session = sessions.get(key(name));
+      if (session == null) {
+        progress.step("skipped", name);
+        continue;
+      }
+      progress.step("restarting", name);
+      final JsonObject message = new JsonObject();
+      message.addProperty("op", "restart");
+      session.send(message);
+      if (!waitFor(() -> sessions.get(key(name)) != session, 120)) {
+        progress.step("timeout", name);
+        return;
+      }
+      if (!waitFor(() -> sessions.containsKey(key(name)), 600)) {
+        progress.step("timeout", name);
+        return;
+      }
+      // Players of the next server can only move here once the health check agrees.
+      server.getHealthChecker().checkAll();
+      waitFor(() -> server.getHealthChecker().isOnline(name), 30);
+      progress.step("back", name);
+    }
+    progress.step("done", "");
   }
 
   /**
@@ -589,7 +617,7 @@ public final class ServerLinks {
     /**
      * One step.
      *
-     * @param step skipped, restarting, back, timeout or done
+     * @param step skipped, restarting, back, timeout, running or done
      * @param server the server
      */
     void step(String step, String server);

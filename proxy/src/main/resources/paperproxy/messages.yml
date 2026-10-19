@@ -133,6 +133,7 @@ paperproxy:
     restart-skipped: "{prefix}<gray><white>{server}</white> is not connected, skipped."
     restart-timeout: "{prefix}<red><white>{server}</white> did not come back in time. The rolling restart stopped. Does the server have a restart script?"
     restart-done: "{prefix}<green>Rolling restart finished."
+    restart-running: "{prefix}<red>A rolling restart is already running."
   discord:
     proxy-started: ":arrow_forward: Proxy started"
     proxy-stopping: ":stop_button: Proxy stopping"

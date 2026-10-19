@@ -39,6 +39,9 @@ import net.paperstream.paperproxy.link.ServerLinks;
  */
 final class LinkCommand {
 
+  private static final org.apache.logging.log4j.Logger LOGGER =
+      org.apache.logging.log4j.LogManager.getLogger(LinkCommand.class);
+
   private LinkCommand() {
     throw new AssertionError();
   }
@@ -146,22 +149,29 @@ final class LinkCommand {
           Argument.string("server", name)));
       return Command.SINGLE_SUCCESS;
     }
-    server.getServerLinks().execute(name, command.startsWith("/") ? command.substring(1)
-        : command).ifPresentOrElse(future -> future.whenComplete((lines, error) -> {
-          if (error != null) {
-            source.sendMessage(Component.translatable("paperproxy.link.exec-failed",
-                Argument.string("server", name)));
-          } else if (lines.isEmpty()) {
-            source.sendMessage(Component.translatable("paperproxy.link.exec-empty",
-                Argument.string("server", name)));
-          } else {
-            for (final String line : lines) {
-              source.sendMessage(Component.translatable("paperproxy.link.exec-line",
-                  Argument.string("server", name), Argument.string("line", line)));
-            }
-          }
-        }), () -> source.sendMessage(Component.translatable("paperproxy.link.offline",
-            Argument.string("server", name))));
+    final String line = command.startsWith("/") ? command.substring(1) : command;
+    LOGGER.info("{} runs /{} on {}", source instanceof com.velocitypowered.api.proxy.Player p
+        ? p.getUsername() : "Console", line, name);
+    final var running = server.getServerLinks().execute(name, line);
+    if (running.isEmpty()) {
+      source.sendMessage(Component.translatable("paperproxy.link.offline",
+          Argument.string("server", name)));
+      return Command.SINGLE_SUCCESS;
+    }
+    running.get().whenComplete((lines, error) -> {
+      if (error != null) {
+        source.sendMessage(Component.translatable("paperproxy.link.exec-failed",
+            Argument.string("server", name)));
+      } else if (lines.isEmpty()) {
+        source.sendMessage(Component.translatable("paperproxy.link.exec-empty",
+            Argument.string("server", name)));
+      } else {
+        for (final String output : lines) {
+          source.sendMessage(Component.translatable("paperproxy.link.exec-line",
+              Argument.string("server", name), Argument.string("line", output)));
+        }
+      }
+    });
     return Command.SINGLE_SUCCESS;
   }
 

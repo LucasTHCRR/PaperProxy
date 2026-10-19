@@ -51,6 +51,8 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
   private static final String HANDLER = "paperstream-link";
   private static final long WARN_INTERVAL_MILLIS = 10 * 60 * 1000L;
   private static final Map<String, Long> WARNED = new ConcurrentHashMap<>();
+  /** Frames before the backend proved its key are small; only a linked backend sends more. */
+  private static final int MAX_UNAUTHENTICATED_FRAME = 8 * 1024;
 
   private enum State {
     START, PAIR_PROOF, PAIR_CONFIRM, LINK_AUTH, LINKED, CLOSED
@@ -70,6 +72,7 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
   private byte[] newLinkKey = new byte[0];
   private ServerLinks.@Nullable Linked linked;
   private LinkProtocol.@Nullable Session session;
+  private final FrameDecoder decoder = new FrameDecoder();
 
   private LinkHandler(final ServerLinks links, final String software) {
     this.links = links;
@@ -99,7 +102,7 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
     final LinkHandler handler = new LinkHandler(links, software);
     pipeline.replace(Connections.HANDLER, HANDLER, handler);
     // Replacing the frame decoder last hands over bytes that arrived behind the handshake.
-    pipeline.replace(Connections.FRAME_DECODER, Connections.FRAME_DECODER, new FrameDecoder());
+    pipeline.replace(Connections.FRAME_DECODER, Connections.FRAME_DECODER, handler.decoder);
   }
 
   @Override
@@ -159,6 +162,11 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
             + "open. Run /paperproxy link pair <name> first.");
         return;
       }
+      if (links.forwardingSecret().isBlank()) {
+        refuse("no-secret", "PaperStream server at {} tried to pair, but the forwarding secret "
+            + "of this proxy is empty. Put a secret into forwarding.secret first.");
+        return;
+      }
       clientPublic = LinkProtocol.unb64(message.get("pub").getAsString());
       backendPort = message.get("port").getAsInt();
       if (backendPort < 1 || backendPort > 65535) {
@@ -211,12 +219,16 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
       refuse("wrong-code", "PaperStream server at {} sent a wrong pairing code");
       return;
     }
+    // The code works once, even if this pairing does not finish.
+    final String name = links.claim(match);
+    if (name == null) {
+      refuse("wrong-code", "PaperStream server at {} used a pairing code that was just used");
+      return;
+    }
     final byte[] shared = LinkProtocol.agree(keyPair.getPrivate(), clientPublic);
     pairingSession = LinkProtocol.pairSession(shared, match.code(), transcript, false);
     pairing = match;
     newLinkKey = LinkProtocol.random(32);
-    // The code works once, even if this pairing does not finish.
-    final String name = links.claim(match);
 
     final JsonObject ok = new JsonObject();
     ok.addProperty("op", "pair-ok");
@@ -267,6 +279,7 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
         LinkProtocol.mac(server.key(), "proxy", name, clientNonce, serverNonce)));
     writePlain(ok);
     state = State.LINKED;
+    decoder.maxFrame = LinkProtocol.MAX_FRAME;
     links.attach(server, this, address());
   }
 
@@ -351,6 +364,8 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
    */
   static final class FrameDecoder extends ByteToMessageDecoder {
 
+    private volatile int maxFrame = MAX_UNAUTHENTICATED_FRAME;
+
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in,
                           final List<Object> out) {
@@ -374,7 +389,7 @@ public final class LinkHandler extends SimpleChannelInboundHandler<ByteBuf> {
           in.readerIndex(start);
           return;
         }
-        if (length < 0 || length > LinkProtocol.MAX_FRAME) {
+        if (length < 0 || length > maxFrame) {
           in.skipBytes(in.readableBytes());
           ctx.close();
           return;
