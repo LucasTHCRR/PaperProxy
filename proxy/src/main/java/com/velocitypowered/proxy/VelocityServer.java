@@ -645,7 +645,9 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
         servers.register(new ServerInfo(entry.getKey(), AddressUtil.parseAddress(entry.getValue())));
       }
     }
-    serverLinks.load();
+    if (paperProxyConfig.values().paperStreamLink()) {
+      serverLinks.load();
+    }
 
     ipAttemptLimiter = Ratelimiters.createWithMilliseconds(configuration.getLoginRatelimit());
     commandRateLimiter = Ratelimiters.createWithMilliseconds(configuration.getCommandRatelimit());

@@ -176,6 +176,13 @@ require-confirm = true
 # Plugins that are never reloaded because they are known to break.
 blocked = ["viaversion", "viabackwards", "viarewind", "luckperms", "geyser", "floodgate"]
 
+[paperstream-link]
+# Off by default. Lets PaperStream servers pair with this proxy (/paperproxy link pair <name>)
+# and open a control link: players are moved before a backend stops, and with the backend's
+# permission /paperproxy link exec and restart work. Each backend decides in its own
+# paperstream.yml what the proxy may do there.
+enabled = false
+
 [updates]
 # Check GitHub releases for new PaperProxy versions and announce them.
 check = true

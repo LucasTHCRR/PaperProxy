@@ -129,6 +129,7 @@ paperproxy:
     exec-empty: "{prefix}<gray>{server} ran the command, it had no output."
     exec-failed: "{prefix}<red>{server} did not answer in time."
     exec-denied: "{prefix}<red>{server} does not allow this command from the proxy. Allow it in proxy.exec-allowed of its paperstream.yml."
+    disabled: "{prefix}<red>The PaperStream link is off. Turn it on with paperstream-link.enabled in paperproxy.toml."
     restart-restarting: "{prefix}<yellow>Restarting <white>{server}</white>, its players move to other servers..."
     restart-back: "{prefix}<green><white>{server}</white> is back."
     restart-skipped: "{prefix}<gray><white>{server}</white> is not connected, skipped."

@@ -46,6 +46,16 @@ final class LinkCommand {
     throw new AssertionError();
   }
 
+  /** The link is off unless paperstream-link.enabled is set in paperproxy.toml. */
+  private static boolean disabled(final VelocityServer server,
+                                  final CommandContext<CommandSource> ctx) {
+    if (server.getPaperProxyConfig().values().paperStreamLink()) {
+      return false;
+    }
+    ctx.getSource().sendMessage(Component.translatable("paperproxy.link.disabled"));
+    return true;
+  }
+
   static LiteralArgumentBuilder<CommandSource> create(final VelocityServer server) {
     final ServerLinks links = server.getServerLinks();
     final SuggestionProvider<CommandSource> linked = (ctx, builder) -> {
@@ -99,6 +109,9 @@ final class LinkCommand {
   }
 
   private static int list(final VelocityServer server, final CommandContext<CommandSource> ctx) {
+    if (disabled(server, ctx)) {
+      return Command.SINGLE_SUCCESS;
+    }
     final ServerLinks links = server.getServerLinks();
     final List<ServerLinks.Linked> all = links.all();
     if (all.isEmpty()) {
@@ -119,6 +132,9 @@ final class LinkCommand {
 
   private static int pair(final VelocityServer server, final CommandContext<CommandSource> ctx,
                           final String group) {
+    if (disabled(server, ctx)) {
+      return Command.SINGLE_SUCCESS;
+    }
     final String name = StringArgumentType.getString(ctx, "server");
     final String code = server.getServerLinks().startPairing(name, group);
     final InetSocketAddress bind = server.getConfiguration().getBind();
@@ -133,6 +149,9 @@ final class LinkCommand {
 
   private static int remove(final VelocityServer server,
                             final CommandContext<CommandSource> ctx) {
+    if (disabled(server, ctx)) {
+      return Command.SINGLE_SUCCESS;
+    }
     final String name = StringArgumentType.getString(ctx, "server");
     ctx.getSource().sendMessage(Component.translatable(server.getServerLinks().unlink(name)
         ? "paperproxy.link.removed" : "paperproxy.link.not-linked",
@@ -141,6 +160,9 @@ final class LinkCommand {
   }
 
   private static int exec(final VelocityServer server, final CommandContext<CommandSource> ctx) {
+    if (disabled(server, ctx)) {
+      return Command.SINGLE_SUCCESS;
+    }
     final String name = StringArgumentType.getString(ctx, "server");
     final String command = StringArgumentType.getString(ctx, "command");
     final CommandSource source = ctx.getSource();
@@ -182,6 +204,9 @@ final class LinkCommand {
 
   private static int restart(final VelocityServer server,
                              final CommandContext<CommandSource> ctx) {
+    if (disabled(server, ctx)) {
+      return Command.SINGLE_SUCCESS;
+    }
     final String target = StringArgumentType.getString(ctx, "target").toLowerCase(Locale.ROOT);
     final ServerLinks links = server.getServerLinks();
     final List<String> names = new ArrayList<>();

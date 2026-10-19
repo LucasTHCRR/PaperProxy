@@ -86,6 +86,7 @@ public final class PaperProxyConfig {
    * @param party party settings
    * @param punish whether the ban, mute and kick commands are registered
    * @param limbo limbo settings
+   * @param paperStreamLink whether PaperStream backends may pair and link
    */
   public record Values(Map<String, PlayerInfoForwarding> forwarding, int paperGuardMaxAgeSeconds,
                        Map<String, VersionRange> versions, boolean healthCheck,
@@ -99,7 +100,7 @@ public final class PaperProxyConfig {
                        AntiBot antiBot, Metrics metrics, String transferOnShutdown,
                        Sync sync, Set<String> hiddenCommands, String queryServer,
                        int queryPort, Discord discord, Restart restart, Party party,
-                       boolean punish, Limbo limbo) {
+                       boolean punish, Limbo limbo, boolean paperStreamLink) {
 
     static Values defaults() {
       return new Values(Map.of(), 10, Map.of(), true, 10, "paperproxy.notify.health", false,
@@ -108,7 +109,7 @@ public final class PaperProxyConfig {
           true, "auto", false, false, Map.of(), Queue.defaults(), "",
           List.of("hub", "lobby"), AntiBot.defaults(), Metrics.defaults(), "",
           Sync.defaults(), Set.of(), "", 0, Discord.defaults(), Restart.defaults(),
-          Party.defaults(), false, Limbo.defaults());
+          Party.defaults(), false, Limbo.defaults(), false);
     }
   }
 
@@ -456,7 +457,8 @@ public final class PaperProxyConfig {
             integer(config, "limbo.max-wait-seconds", d.limbo().maxWaitSeconds(), 10, 3600,
                 errors),
             config.get("limbo.kick-messages") == null ? d.limbo().kickMessages()
-                : stringList(config.get("limbo.kick-messages"))));
+                : stringList(config.get("limbo.kick-messages"))),
+        bool(config, "paperstream-link.enabled", d.paperStreamLink(), errors));
   }
 
   /**
