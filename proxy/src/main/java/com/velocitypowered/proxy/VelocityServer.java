@@ -119,6 +119,7 @@ import net.paperstream.paperproxy.command.PartyCommand;
 import net.paperstream.paperproxy.command.PunishCommands;
 import net.paperstream.paperproxy.config.PaperProxyConfig;
 import net.paperstream.paperproxy.forwarding.Forwarding;
+import net.paperstream.paperproxy.link.ServerLinks;
 import net.paperstream.paperproxy.messages.PaperProxyMessages;
 import net.paperstream.paperproxy.network.AntiBot;
 import net.paperstream.paperproxy.network.DiscordWebhook;
@@ -229,6 +230,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   private final Parties parties = new Parties(this);
   private final ProxyStats proxyStats = new ProxyStats();
   private final Limbo limbo = new Limbo(this);
+  private final ServerLinks serverLinks = new ServerLinks(this, Path.of(""));
   private final PaperProxyApi paperProxyApi = new PaperProxyApi(this);
   private volatile boolean listening;
   private final Motd motd = new Motd(Path.of(""));
@@ -416,6 +418,15 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
    */
   public Limbo getLimbo() {
     return limbo;
+  }
+
+  /**
+   * Returns the PaperStream backends paired with this proxy.
+   *
+   * @return the links
+   */
+  public ServerLinks getServerLinks() {
+    return serverLinks;
   }
 
   /**
@@ -631,6 +642,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
         servers.register(new ServerInfo(entry.getKey(), AddressUtil.parseAddress(entry.getValue())));
       }
     }
+    serverLinks.load();
 
     ipAttemptLimiter = Ratelimiters.createWithMilliseconds(configuration.getLoginRatelimit());
     commandRateLimiter = Ratelimiters.createWithMilliseconds(configuration.getCommandRatelimit());

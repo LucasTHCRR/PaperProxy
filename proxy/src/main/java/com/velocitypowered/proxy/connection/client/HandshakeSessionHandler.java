@@ -46,6 +46,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.paperstream.paperproxy.link.LinkHandler;
+import net.paperstream.paperproxy.link.LinkProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -90,6 +92,13 @@ public class HandshakeSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(final HandshakePacket handshake) {
+    if (handshake.getNextStatus() == StateRegistry.STATUS_ID
+        && LinkProtocol.HOST.equals(handshake.getServerAddress())) {
+      // A PaperStream backend opening its control link, not a player.
+      LinkHandler.takeOver(connection.getChannel(), server.getServerLinks(),
+          server.getVersion().getName() + " " + server.getVersion().getVersion());
+      return true;
+    }
     final StateRegistry nextState = getStateForProtocol(handshake.getNextStatus());
     if (nextState == null) {
       LOGGER.error("{} provided invalid protocol {}", this, handshake.getNextStatus());

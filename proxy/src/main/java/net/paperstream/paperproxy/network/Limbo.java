@@ -88,7 +88,9 @@ public final class Limbo {
         || player.getConnectedServer() != null || !player.isActive()) {
       return false;
     }
-    if (event.getServerKickReason().isPresent()
+    final boolean announced = server.getServerLinks()
+        .announcedStop(event.getServer().getServerInfo().getName());
+    if (!announced && event.getServerKickReason().isPresent()
         && !isShutdownMessage(event.getServerKickReason().get(), settings.kickMessages())) {
       // A real kick (ban, AFK, plugin): respect it.
       return false;
@@ -209,5 +211,6 @@ public final class Limbo {
   @Subscribe
   public void onDisconnect(final DisconnectEvent event) {
     waiting.remove(event.getPlayer().getUniqueId());
+    server.getServerLinks().forget(event.getPlayer().getUniqueId());
   }
 }

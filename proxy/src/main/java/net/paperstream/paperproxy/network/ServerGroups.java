@@ -48,7 +48,18 @@ public final class ServerGroups {
   }
 
   private Map<String, List<String>> groups() {
-    return server.getPaperProxyConfig().values().groups();
+    final Map<String, List<String>> linked = server.getServerLinks().groups();
+    if (linked.isEmpty()) {
+      return server.getPaperProxyConfig().values().groups();
+    }
+    final Map<String, List<String>> merged =
+        new java.util.LinkedHashMap<>(server.getPaperProxyConfig().values().groups());
+    linked.forEach((group, members) -> merged.merge(group, members, (a, b) -> {
+      final List<String> all = new java.util.ArrayList<>(a);
+      b.stream().filter(m -> !all.contains(m)).forEach(all::add);
+      return all;
+    }));
+    return merged;
   }
 
   /**

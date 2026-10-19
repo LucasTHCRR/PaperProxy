@@ -72,7 +72,12 @@ public final class Forwarding {
   public PlayerInfoForwarding modeFor(final String serverName) {
     final PlayerInfoForwarding override = config.values().forwarding()
         .get(serverName.toLowerCase(Locale.ROOT));
-    return override != null ? override : server.getConfiguration().getPlayerInfoForwardingMode();
+    if (override != null) {
+      return override;
+    }
+    // Paired PaperStream servers got the modern forwarding secret.
+    return server.getServerLinks().isLinked(serverName) ? PlayerInfoForwarding.MODERN
+        : server.getConfiguration().getPlayerInfoForwardingMode();
   }
 
   /**

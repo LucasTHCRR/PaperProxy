@@ -82,6 +82,7 @@ public final class PaperProxyCommand {
                     .executes(ctx -> maintenance(server, ctx,
                         StringArgumentType.getString(ctx, "server"), false)))))
         .then(PluginCommand.create(server))
+        .then(LinkCommand.create(server))
         .then(BrigadierCommand.literalArgumentBuilder("via")
             .executes(ctx -> usage(ctx, "/paperproxy via install|update"))
             .requires(source -> source.getPermissionValue("paperproxy.command.via")
