@@ -159,7 +159,12 @@ final class LinkCommand {
       return Command.SINGLE_SUCCESS;
     }
     running.get().whenComplete((lines, error) -> {
-      if (error != null) {
+      final Throwable cause = error instanceof java.util.concurrent.CompletionException
+          && error.getCause() != null ? error.getCause() : error;
+      if (cause instanceof net.paperstream.paperproxy.link.ServerLinks.ExecDeniedException) {
+        source.sendMessage(Component.translatable("paperproxy.link.exec-denied",
+            Argument.string("server", name)));
+      } else if (error != null) {
         source.sendMessage(Component.translatable("paperproxy.link.exec-failed",
             Argument.string("server", name)));
       } else if (lines.isEmpty()) {

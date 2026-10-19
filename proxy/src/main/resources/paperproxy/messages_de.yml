@@ -116,6 +116,7 @@ paperproxy:
     exec-line: "<dark_gray>[{server}]</dark_gray> <gray>{line}"
     exec-empty: "{prefix}<gray>{server} hat den Befehl ausgeführt, ohne Ausgabe."
     exec-failed: "{prefix}<red>{server} hat nicht rechtzeitig geantwortet."
+    exec-denied: "{prefix}<red>{server} erlaubt diesen Befehl vom Proxy aus nicht. Freigeben unter proxy.exec-allowed in seiner paperstream.yml."
     restart-restarting: "{prefix}<yellow><white>{server}</white> startet neu, die Spieler wechseln auf andere Server..."
     restart-back: "{prefix}<green><white>{server}</white> ist wieder da."
     restart-skipped: "{prefix}<gray><white>{server}</white> ist nicht verbunden, übersprungen."

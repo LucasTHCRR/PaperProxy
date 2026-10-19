@@ -413,6 +413,10 @@ public final class ServerLinks {
         if (command != null && command.server().equals(key(name))) {
           commands.remove(id);
           final CompletableFuture<List<String>> future = command.future();
+          if (message.has("denied") && message.get("denied").getAsBoolean()) {
+            future.completeExceptionally(new ExecDeniedException());
+            return;
+          }
           final List<String> lines = new ArrayList<>();
           final JsonArray array = message.getAsJsonArray("lines");
           if (array != null) {
@@ -421,8 +425,14 @@ public final class ServerLinks {
           future.complete(lines);
         }
       }
+      case "ping" -> {
+        // the backend notices a hanging proxy by missing answers
+        final JsonObject pong = new JsonObject();
+        pong.addProperty("op", "pong");
+        handler.send(pong);
+      }
       default -> {
-        // ping and future messages: nothing to do
+        // future messages: nothing to do
       }
     }
   }
@@ -647,5 +657,17 @@ public final class ServerLinks {
    */
   String forwardingSecret() {
     return new String(server.getConfiguration().getForwardingSecret(), StandardCharsets.UTF_8);
+  }
+
+  /**
+   * The backend refused a command because its proxy.exec-allowed list does not contain it.
+   */
+  public static final class ExecDeniedException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
+    ExecDeniedException() {
+      super("not allowed on this server", null, false, false);
+    }
   }
 }
