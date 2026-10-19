@@ -514,7 +514,10 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       implVendor = "PaperProxy Contributors";
     }
 
-    return new ProxyVersion(implName, implVendor, implVersion);
+    // Plugins read the Velocity major version from here (LibertyBans refuses to start on
+    // "1.2.3-RELEASE"), so the Velocity version this build is based on comes first.
+    return new ProxyVersion(implName, implVendor,
+        PaperProxyBranding.velocityVersion() + " (" + implName + " " + implVersion + ")");
   }
 
   private VelocityPluginContainer createVirtualPlugin() {
@@ -543,7 +546,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   void start() {
     PaperProxyBranding.printBanner(logger, getVersion());
     PaperProxyProvider.set(paperProxyApi);
-    logger.info("Booting up {} {}...", getVersion().getName(), getVersion().getVersion());
+    logger.info("Booting up {} {}...", getVersion().getName(), PaperProxyBranding.version());
     console.setupStreams();
     pluginManager.registerPlugin(this.createVirtualPlugin());
 

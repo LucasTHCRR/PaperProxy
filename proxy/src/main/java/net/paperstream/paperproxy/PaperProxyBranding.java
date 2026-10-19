@@ -60,6 +60,19 @@ public final class PaperProxyBranding {
   }
 
   /**
+   * Returns the PaperProxy version itself. Plugins see the Velocity version first through
+   * {@code ProxyServer#getVersion()}, because many of them read the Velocity major version
+   * from it.
+   *
+   * @return for example {@code 1.2.3-RELEASE}
+   */
+  public static String version() {
+    final Package pkg = PaperProxyBranding.class.getPackage();
+    final String version = pkg == null ? null : pkg.getImplementationVersion();
+    return version == null ? "<unknown>" : version;
+  }
+
+  /**
    * Logs the start banner. It cannot be turned off on purpose: PaperProxy must never be
    * mistaken for an official PaperMC project.
    *
@@ -72,7 +85,7 @@ public final class PaperProxyBranding {
       logger.info(line);
     }
     logger.info("");
-    logger.info("{} {} - {}", NAME, version.getVersion(), DISCLAIMER);
+    logger.info("{} {} - {}", NAME, version(), DISCLAIMER);
     logger.info("Based on Velocity {} (GPL-3.0). {}", VELOCITY_VERSION, REPOSITORY_URL);
     logger.info("Please report problems to PaperProxy, not to PaperMC: {}", DISCORD_URL);
     logger.info("------------------------------------------------------------");

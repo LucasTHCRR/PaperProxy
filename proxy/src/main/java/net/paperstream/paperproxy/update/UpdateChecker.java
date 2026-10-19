@@ -153,7 +153,7 @@ public final class UpdateChecker {
     }
     final Version current;
     try {
-      current = Version.parse(server.getVersion().getVersion().split(" ")[0]);
+      current = Version.parse(net.paperstream.paperproxy.PaperProxyBranding.version());
     } catch (IllegalArgumentException e) {
       return;
     }
@@ -270,7 +270,7 @@ public final class UpdateChecker {
    * @return the message
    */
   public Component notice(final Release release) {
-    final String current = server.getVersion().getVersion().split(" ")[0];
+    final String current = net.paperstream.paperproxy.PaperProxyBranding.version();
     final String jar = release.jarUrl() != null ? release.jarUrl() : release.url();
     final Component download = Component.translatable("paperproxy.update.button-download")
         .clickEvent(ClickEvent.openUrl(jar))
@@ -460,7 +460,7 @@ public final class UpdateChecker {
   }
 
   private Version currentVersion() {
-    return Version.parse(server.getVersion().getVersion().split(" ")[0]);
+    return Version.parse(net.paperstream.paperproxy.PaperProxyBranding.version());
   }
 
   /**

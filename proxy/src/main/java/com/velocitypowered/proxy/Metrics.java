@@ -124,7 +124,7 @@ public class Metrics {
               () -> server.getConfiguration().isOnlineMode() ? "online" : "offline")
       );
       metrics.addCustomChart(new SimplePie("paperproxy_version",
-          () -> server.getVersion().getVersion()));
+          net.paperstream.paperproxy.PaperProxyBranding::version));
       metrics.addCustomChart(new AdvancedPie("plugin_types", () -> {
         final List<String> bungee = server.getBungeeLayer() == null ? List.of()
             : server.getBungeeLayer().pluginNames();

@@ -329,10 +329,15 @@ public final class EventBridge {
       return;
     }
     final BungeePlayer player = layer.player(event.getPlayer());
-    event.getPlayer().getCurrentServer().ifPresent(server ->
-        call(new ServerDisconnectEvent(player, layer.serverInfo(server.getServerInfo().getName()))));
-    call(new PlayerDisconnectEvent(player));
-    layer.forgetPlayer(event.getPlayer());
+    layer.leaving().add(event.getPlayer());
+    try {
+      event.getPlayer().getCurrentServer().ifPresent(server -> call(new ServerDisconnectEvent(
+          player, layer.serverInfo(server.getServerInfo().getName()))));
+      call(new PlayerDisconnectEvent(player));
+    } finally {
+      layer.leaving().remove(event.getPlayer());
+      layer.forgetPlayer(event.getPlayer());
+    }
   }
 
   // ------------------------------------------------------------------ chat and commands

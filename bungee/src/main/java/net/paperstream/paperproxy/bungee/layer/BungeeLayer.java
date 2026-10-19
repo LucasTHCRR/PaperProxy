@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +76,7 @@ public final class BungeeLayer implements BungeeLayerHandle {
   private final Cookies cookies = new Cookies();
   private final CommandBridge commands;
   private final Map<UUID, BungeePlayer> players = new ConcurrentHashMap<>();
+  private final Set<Player> leaving = java.util.concurrent.ConcurrentHashMap.newKeySet();
   private final Map<String, BungeeServerInfo> serverInfos = new ConcurrentHashMap<>();
   private volatile ListenerInfo listenerInfo;
   private volatile ScheduledTask commandSync;
@@ -399,6 +401,15 @@ public final class BungeeLayer implements BungeeLayerHandle {
 
   BungeePlayer player(final Player player) {
     return players.computeIfAbsent(player.getUniqueId(), id -> new BungeePlayer(this, player));
+  }
+
+  /**
+   * Players whose PlayerDisconnectEvent is running. BungeeCord still lists them then.
+   *
+   * @return the players
+   */
+  Set<Player> leaving() {
+    return leaving;
   }
 
   void forgetPlayer(final Player player) {

@@ -39,9 +39,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyConfig;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ReconnectHandler;
 import net.md_5.bungee.api.Title;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -49,19 +49,19 @@ import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
-import net.md_5.bungee.api.scheduler.TaskScheduler;
 import net.paperstream.paperproxy.PaperProxyBranding;
 
 /**
  * PaperProxy as {@code net.md_5.bungee.api.ProxyServer}.
  */
-final class BungeeProxyServer extends ProxyServer {
+final class BungeeProxyServer extends BungeeCord {
 
   private final BungeeLayer layer;
   private final Logger logger = JulBridge.createProxyLogger();
   private final Set<String> channels = ConcurrentHashMap.newKeySet();
   private volatile ConfigurationAdapter configurationAdapter;
   private volatile ReconnectHandler reconnectHandler;
+  private final net.md_5.bungee.scheduler.BungeeScheduler scheduler;
   /**
    * Same name and type as in BungeeCord, because plugins such as BungeeMessages replace the
    * proxy's texts by writing this field through reflection.
@@ -71,6 +71,7 @@ final class BungeeProxyServer extends ProxyServer {
 
   BungeeProxyServer(final BungeeLayer layer) {
     this.layer = layer;
+    this.scheduler = new net.md_5.bungee.scheduler.BungeeScheduler(layer.scheduler());
     this.configurationAdapter = new BungeeConfig.Adapter(layer);
   }
 
@@ -114,20 +115,29 @@ final class BungeeProxyServer extends ProxyServer {
 
   @Override
   public Collection<ProxiedPlayer> getPlayers() {
-    return layer.velocity().getAllPlayers().stream()
-        .map(layer::player)
-        .map(ProxiedPlayer.class::cast)
-        .toList();
+    final List<ProxiedPlayer> players = new java.util.ArrayList<>();
+    layer.velocity().getAllPlayers().forEach(p -> players.add(layer.player(p)));
+    // In BungeeCord a player still counts while PlayerDisconnectEvent runs.
+    for (final com.velocitypowered.api.proxy.Player leaving : layer.leaving()) {
+      if (layer.velocity().getPlayer(leaving.getUniqueId()).isEmpty()) {
+        players.add(layer.player(leaving));
+      }
+    }
+    return Collections.unmodifiableList(players);
   }
 
   @Override
   public ProxiedPlayer getPlayer(final String name) {
-    return layer.velocity().getPlayer(name).map(layer::player).orElse(null);
+    return layer.velocity().getPlayer(name).or(() -> layer.leaving().stream()
+        .filter(p -> p.getUsername().equalsIgnoreCase(name)).findFirst())
+        .map(layer::player).orElse(null);
   }
 
   @Override
   public ProxiedPlayer getPlayer(final UUID uuid) {
-    return layer.velocity().getPlayer(uuid).map(layer::player).orElse(null);
+    return layer.velocity().getPlayer(uuid).or(() -> layer.leaving().stream()
+        .filter(p -> p.getUniqueId().equals(uuid)).findFirst())
+        .map(layer::player).orElse(null);
   }
 
   @Override
@@ -235,13 +245,19 @@ final class BungeeProxyServer extends ProxyServer {
   }
 
   @Override
-  public TaskScheduler getScheduler() {
-    return layer.scheduler();
+  public net.md_5.bungee.scheduler.BungeeScheduler getScheduler() {
+    return scheduler;
   }
 
   @Override
   public int getOnlineCount() {
-    return layer.velocity().getPlayerCount();
+    int count = layer.velocity().getPlayerCount();
+    for (final com.velocitypowered.api.proxy.Player leaving : layer.leaving()) {
+      if (layer.velocity().getPlayer(leaving.getUniqueId()).isEmpty()) {
+        count++;
+      }
+    }
+    return count;
   }
 
   @Override

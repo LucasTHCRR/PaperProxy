@@ -24,6 +24,10 @@ dependencies {
         exclude(group = "it.unimi.dsi")
         exclude(group = "org.ow2.asm", module = "asm")
     }
+    // BungeeCord ships the MySQL driver, and plugins such as Party and Friends rely on it.
+    implementation("com.mysql:mysql-connector-j:9.4.0") {
+        exclude(group = "com.google.protobuf")
+    }
     // Needed by Bungee's LibraryLoader for the "libraries" section of bungee.yml.
     implementation("org.apache.maven:maven-resolver-provider:3.9.6")
     implementation("org.apache.maven.resolver:maven-resolver-connector-basic:1.9.18")

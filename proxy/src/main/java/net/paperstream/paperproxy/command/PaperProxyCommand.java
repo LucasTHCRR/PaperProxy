@@ -177,9 +177,9 @@ public final class PaperProxyCommand {
         .content(version.getName() + " ")
         .decoration(TextDecoration.BOLD, true)
         .color(BRAND_COLOR)
-        .append(Component.text(version.getVersion()).decoration(TextDecoration.BOLD, false))
+        .append(Component.text(PaperProxyBranding.version()).decoration(TextDecoration.BOLD, false))
         .hoverEvent(Component.translatable("velocity.command.version-offer-copy-version"))
-        .clickEvent(ClickEvent.copyToClipboard(version.getName() + " " + version.getVersion()))
+        .clickEvent(ClickEvent.copyToClipboard(version.getName() + " " + PaperProxyBranding.version()))
         .build());
     source.sendMessage(Component.translatable("paperproxy.command.disclaimer"));
     source.sendMessage(Component.translatable("paperproxy.command.based-on",

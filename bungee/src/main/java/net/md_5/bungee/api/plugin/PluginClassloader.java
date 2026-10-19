@@ -101,6 +101,36 @@ final class PluginClassloader extends URLClassLoader
 
     private Class<?> loadClass0(String name, boolean resolve, boolean checkOther, boolean checkLibraries) throws ClassNotFoundException
     {
+        // PaperProxy: BungeeCord has no Adventure, so plugins that need it ship their own copy,
+        // in the jar or added at runtime (libby and similar add URLs to this loader). The proxy
+        // has another Adventure version; the plugin's copy must win, otherwise its serializers
+        // call methods the proxy's version does not have.
+        if ( name.startsWith( "net.kyori." ) )
+        {
+            synchronized ( getClassLoadingLock( name ) )
+            {
+                Class<?> own = findLoadedClass( name );
+                if ( own == null )
+                {
+                    try
+                    {
+                        own = findClass( name );
+                    } catch ( ClassNotFoundException ex )
+                    {
+                        // not shipped by the plugin: use the proxy's
+                    }
+                }
+                if ( own != null )
+                {
+                    if ( resolve )
+                    {
+                        resolveClass( own );
+                    }
+                    return own;
+                }
+            }
+        }
+
         try
         {
             Class<?> result = super.loadClass( name, resolve );

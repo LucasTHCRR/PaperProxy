@@ -96,7 +96,7 @@ public class HandshakeSessionHandler implements MinecraftSessionHandler {
         && LinkProtocol.HOST.equals(handshake.getServerAddress())) {
       // A PaperStream backend opening its control link, not a player.
       LinkHandler.takeOver(connection.getChannel(), server.getServerLinks(),
-          server.getVersion().getName() + " " + server.getVersion().getVersion());
+          server.getVersion().getName() + " " + net.paperstream.paperproxy.PaperProxyBranding.version());
       return true;
     }
     final StateRegistry nextState = getStateForProtocol(handshake.getNextStatus());
