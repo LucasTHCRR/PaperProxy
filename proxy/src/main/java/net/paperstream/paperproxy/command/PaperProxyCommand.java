@@ -114,6 +114,14 @@ public final class PaperProxyCommand {
               }
               return Command.SINGLE_SUCCESS;
             }))
+        .then(BrigadierCommand.literalArgumentBuilder("migrate")
+            .requires(source -> source.getPermissionValue("paperproxy.command.migrate")
+                == Tristate.TRUE)
+            .executes(ctx -> usage(ctx, "/paperproxy migrate check"))
+            .then(BrigadierCommand.literalArgumentBuilder("check").executes(ctx -> {
+              MigrateCheck.run(server, ctx.getSource());
+              return Command.SINGLE_SUCCESS;
+            })))
         .then(BrigadierCommand.literalArgumentBuilder("servers")
             .requires(source -> source.getPermissionValue("paperproxy.command.servers")
                 == Tristate.TRUE)

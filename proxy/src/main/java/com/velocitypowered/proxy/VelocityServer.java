@@ -753,6 +753,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   private void doStartupConfigLoad() {
     try {
       Path configPath = Path.of("velocity.toml");
+      // PaperProxy: coming from BungeeCord or Waterfall, build velocity.toml from their config.yml
+      net.paperstream.paperproxy.config.BungeeImport.importIfPresent(configPath, logger);
       configuration = VelocityConfiguration.read(configPath);
 
       if (!configuration.validate()) {

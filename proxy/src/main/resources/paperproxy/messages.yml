@@ -211,6 +211,20 @@ paperproxy:
     result: "{prefix}<gray>IP of <white>{player}</white>: <white>{ip}"
   servers:
     line: "<white>{server}</white> <dark_gray>|</dark_gray> <gray>{state}</gray> <dark_gray>|</dark_gray> <gray>{players} players</gray> <dark_gray>|</dark_gray> <gray>forwarding {forwarding}"
+  migrate:
+    header: "{prefix}<gray>Migration check for <white>{count}</white> servers:"
+    server: "<white>{server}</white> <dark_gray>|</dark_gray> {state} <dark_gray>|</dark_gray> <gray>forwarding {forwarding}"
+    ok: "{prefix}<green>Nothing found that needs fixing."
+    offline: "  <gold>→</gold> <gray>Not reachable. Is the server running and is the address in velocity.toml right?"
+    bungeecord: "  <gold>→</gold> <gray>The server expects BungeeCord forwarding (bungeecord: true in spigot.yml). Set its forwarding to legacy, or better switch it to velocity.enabled in paper-global.yml and use modern."
+    legacy-off: "  <gold>→</gold> <gray>The server does not accept BungeeCord forwarding. Set bungeecord: true in its spigot.yml, or, if it has velocity.enabled in paper-global.yml, set its forwarding to modern."
+    velocity-required: "  <gold>→</gold> <gray>The server expects Velocity forwarding (velocity.enabled in paper-global.yml). Set its forwarding to modern in velocity.toml or paperproxy.toml."
+    secret: "  <gold>→</gold> <gray>The forwarding secret does not match. Copy forwarding.secret into velocity.secret in the server's paper-global.yml."
+    online-mode: "  <gold>→</gold> <gray>The server checks logins itself. Set online-mode=false in its server.properties, the proxy already does that check."
+    outdated: "  <gold>→</gold> <gray>Version mismatch with the client. Install ViaVersion with /paperproxy via install."
+    kick: "  <gold>→</gold> <gray>Last kick from this server: <white>{reason}"
+    forwarding-none: "{prefix}<gold>Forwarding is off for {servers}.</gold> <gray>Those servers see the proxy's IP and offline UUIDs. Use modern forwarding."
+    proxy-offline-mode: "{prefix}<gold>online-mode is false in velocity.toml:</gold> <gray>accounts are not checked with Mojang, anyone can join under any name."
   plugin:
     warning: "<gold>Plugin reload is experimental.</gold>\n<gray>Some plugins misbehave afterwards (duplicate events, memory leaks, broken connections). If problems occur, restart the proxy. Do not report errors that only happen after a reload to the plugin author.</gray>\n<gray>Type <white>/{command}</white> to continue."
     working: "{prefix}<gray>Working on <white>{plugin}</white> in the background..."

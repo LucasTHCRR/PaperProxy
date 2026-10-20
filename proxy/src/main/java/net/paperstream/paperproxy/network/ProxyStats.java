@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 /**
  * Counters for the metrics endpoint: logins, refused logins, server switches with their
@@ -114,6 +115,21 @@ public final class ProxyStats {
     pending.remove(event.getPlayer().getUniqueId());
     kicks.computeIfAbsent(event.getServer().getServerInfo().getName(), k -> new LongAdder())
         .increment();
+    event.getServerKickReason().ifPresent(reason -> lastKickReason.put(
+        event.getServer().getServerInfo().getName(),
+        PlainTextComponentSerializer.plainText().serialize(reason)));
+  }
+
+  private final Map<String, String> lastKickReason = new ConcurrentHashMap<>();
+
+  /**
+   * Returns the text of the last kick from a backend server, used by /paperproxy migrate check.
+   *
+   * @param server the server name
+   * @return the kick text, or null if nobody was kicked from it since the start
+   */
+  public String lastKickReason(final String server) {
+    return lastKickReason.get(server);
   }
 
   /**

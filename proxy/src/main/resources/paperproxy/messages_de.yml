@@ -199,6 +199,20 @@ paperproxy:
     result: "{prefix}<gray>IP von <white>{player}</white>: <white>{ip}"
   servers:
     line: "<white>{server}</white> <dark_gray>|</dark_gray> <gray>{state}</gray> <dark_gray>|</dark_gray> <gray>{players} Spieler</gray> <dark_gray>|</dark_gray> <gray>Forwarding {forwarding}"
+  migrate:
+    header: "{prefix}<gray>Migrations-Check für <white>{count}</white> Server:"
+    server: "<white>{server}</white> <dark_gray>|</dark_gray> {state} <dark_gray>|</dark_gray> <gray>Forwarding {forwarding}"
+    ok: "{prefix}<green>Nichts gefunden, was angepasst werden muss."
+    offline: "  <gold>→</gold> <gray>Nicht erreichbar. Läuft der Server und stimmt die Adresse in velocity.toml?"
+    bungeecord: "  <gold>→</gold> <gray>Der Server erwartet BungeeCord-Forwarding (bungeecord: true in spigot.yml). Forwarding auf legacy stellen, oder besser auf dem Server velocity.enabled in paper-global.yml einschalten und modern nutzen."
+    legacy-off: "  <gold>→</gold> <gray>Der Server nimmt kein BungeeCord-Forwarding an. In seiner spigot.yml bungeecord: true setzen, oder, wenn er velocity.enabled in der paper-global.yml hat, sein Forwarding auf modern stellen."
+    velocity-required: "  <gold>→</gold> <gray>Der Server erwartet Velocity-Forwarding (velocity.enabled in paper-global.yml). Forwarding für ihn in velocity.toml oder paperproxy.toml auf modern stellen."
+    secret: "  <gold>→</gold> <gray>Das Forwarding-Secret passt nicht. Inhalt von forwarding.secret in velocity.secret der paper-global.yml des Servers eintragen."
+    online-mode: "  <gold>→</gold> <gray>Der Server prüft Logins selbst. In seiner server.properties online-mode=false setzen, das prüft schon der Proxy."
+    outdated: "  <gold>→</gold> <gray>Versionen passen nicht zum Client. ViaVersion installieren mit /paperproxy via install."
+    kick: "  <gold>→</gold> <gray>Letzter Kick von diesem Server: <white>{reason}"
+    forwarding-none: "{prefix}<gold>Forwarding ist aus für {servers}.</gold> <gray>Diese Server sehen die IP des Proxys und Offline-UUIDs. Modern-Forwarding nutzen."
+    proxy-offline-mode: "{prefix}<gold>online-mode ist false in velocity.toml:</gold> <gray>Accounts werden nicht bei Mojang geprüft, jeder kann mit jedem Namen joinen."
   plugin:
     warning: "<gold>Plugin-Reload ist experimentell.</gold>\n<gray>Manche Plugins verhalten sich danach fehlerhaft (doppelte Events, Speicherlecks, kaputte Verbindungen). Bei Problemen den Proxy neu starten. Fehler, die nur nach einem Reload auftreten, bitte nicht beim Plugin-Autor melden.</gray>\n<gray>Tippe <white>/{command}</white>, um fortzufahren."
     working: "{prefix}<gray>Bearbeite <white>{plugin}</white> im Hintergrund..."
