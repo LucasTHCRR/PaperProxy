@@ -140,7 +140,7 @@ class UpdateTest {
     for (final String tag : new String[] {"v1.0.0-ALPHA", "v1.1.0-ALPHA", "v1.2.0-BETA"}) {
       final JsonObject release = new JsonObject();
       release.addProperty("tag_name", tag);
-      release.addProperty("html_url", "https://github.com/OPaperStream/PaperProxy/releases/tag/" + tag);
+      release.addProperty("html_url", "https://github.com/LucasTHCRR/PaperProxy/releases/tag/" + tag);
       release.addProperty("prerelease", true);
       releases.add(release);
     }

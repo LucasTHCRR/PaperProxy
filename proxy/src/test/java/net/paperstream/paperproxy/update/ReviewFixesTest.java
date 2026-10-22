@@ -62,7 +62,7 @@ class ReviewFixesTest {
 
   @Test
   void onlyGithubLinksAreTrusted() {
-    assertTrue(UpdateChecker.trusted("https://github.com/OPaperStream/PaperProxy/releases", false));
+    assertTrue(UpdateChecker.trusted("https://github.com/LucasTHCRR/PaperProxy/releases", false));
     assertTrue(UpdateChecker.trusted(
         "https://release-assets.githubusercontent.com/x/paperproxy.jar", false));
     assertFalse(UpdateChecker.trusted("http://github.com/x", false));
@@ -77,7 +77,7 @@ class ReviewFixesTest {
     final JsonArray releases = JsonParser.parseString("""
         [
           {"tag_name": "v1.3.0-RELEASE", "prerelease": false,
-           "html_url": "https://github.com/OPaperStream/PaperProxy/releases/tag/v1.3.0-RELEASE",
+           "html_url": "https://github.com/LucasTHCRR/PaperProxy/releases/tag/v1.3.0-RELEASE",
            "assets": [
              {"name": "paperproxy-1.3.0-RELEASE-full.jar",
               "browser_download_url": "https://github.com/f/full.jar"},
@@ -91,7 +91,7 @@ class ReviewFixesTest {
               "browser_download_url": "https://github.com/f/right.jar.sig"}
            ]},
           {"tag_name": "v1.2.5-RELEASE", "prerelease": true,
-           "html_url": "https://github.com/OPaperStream/PaperProxy/releases/tag/v1.2.5-RELEASE"}
+           "html_url": "https://github.com/LucasTHCRR/PaperProxy/releases/tag/v1.2.5-RELEASE"}
         ]
         """).getAsJsonArray();
     final UpdateChecker.Release release = UpdateChecker.newest(releases, "release");

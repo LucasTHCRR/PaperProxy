@@ -70,7 +70,7 @@ public final class UpdateChecker {
   public static final String PERMISSION = "paperproxy.update";
   private static final Logger logger = LogManager.getLogger(UpdateChecker.class);
   private static final String DEFAULT_API =
-      "https://api.github.com/repos/OPaperStream/PaperProxy/releases";
+      "https://api.github.com/repos/LucasTHCRR/PaperProxy/releases";
   /** Where a downloaded update waits; the launcher looks in the same place. */
   static final Path UPDATE_DIRECTORY = Path.of(System.getProperty("paperproxy.updateDir",
       "update"));

@@ -27,7 +27,7 @@ extensions.configure<PublishingExtension> {
             pom {
                 name.set("PaperProxy " + project.name.removePrefix("velocity-").replaceFirstChar { it.uppercase() })
                 description.set("API for plugins on PaperProxy, a Velocity fork that also runs BungeeCord plugins. Not affiliated with PaperMC.")
-                url.set("https://github.com/OPaperStream/PaperProxy")
+                url.set("https://github.com/LucasTHCRR/PaperProxy")
                 licenses {
                     license {
                         name.set("MIT License")
@@ -45,8 +45,8 @@ extensions.configure<PublishingExtension> {
                     }
                 }
                 scm {
-                    url.set("https://github.com/OPaperStream/PaperProxy")
-                    connection.set("scm:git:https://github.com/OPaperStream/PaperProxy.git")
+                    url.set("https://github.com/LucasTHCRR/PaperProxy")
+                    connection.set("scm:git:https://github.com/LucasTHCRR/PaperProxy.git")
                 }
             }
         }

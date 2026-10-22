@@ -27,7 +27,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * The PaperGuard wire format, see https://github.com/OPaperStream/PaperGuard. The PaperGuard
+ * The PaperGuard wire format, see https://github.com/LucasTHCRR/PaperGuard. The PaperGuard
  * plugin implements the same format; both are checked against the same test vectors.
  *
  * <p>A PaperGuard login is a BungeeCord legacy handshake ({@code host\0ip\0uuid\0properties})

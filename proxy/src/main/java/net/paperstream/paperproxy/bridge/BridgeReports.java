@@ -45,7 +45,7 @@ public final class BridgeReports {
   public static final MinecraftChannelIdentifier CHANNEL =
       MinecraftChannelIdentifier.from("paperproxy:bridge");
   /** Where backend owners get PaperGuard. */
-  public static final String PAPERGUARD_URL = "https://github.com/OPaperStream/PaperGuard";
+  public static final String PAPERGUARD_URL = "https://github.com/LucasTHCRR/PaperGuard";
   private static final List<String> VIA = List.of("viaversion", "viabackwards", "viarewind");
   private static final Logger logger = LogManager.getLogger(BridgeReports.class);
 

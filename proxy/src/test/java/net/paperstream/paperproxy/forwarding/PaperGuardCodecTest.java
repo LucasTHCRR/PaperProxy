@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * The proxy must sign exactly like the PaperGuard plugin expects. The vectors are copied from
- * https://github.com/OPaperStream/PaperGuard/blob/main/test-vectors.json.
+ * https://github.com/LucasTHCRR/PaperGuard/blob/main/test-vectors.json.
  */
 class PaperGuardCodecTest {
 

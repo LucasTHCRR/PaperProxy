@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Thanks for testing PaperProxy. The more of the fields below you fill in, the faster a bug can be reproduced and fixed.
-        Security problems please not here, see [SECURITY.md](https://github.com/OPaperStream/PaperProxy/blob/main/SECURITY.md).
+        Security problems please not here, see [SECURITY.md](https://github.com/LucasTHCRR/PaperProxy/blob/main/SECURITY.md).
 
   - type: textarea
     attributes:
@@ -104,9 +104,9 @@ body:
     attributes:
       label: Checks
       options:
-        - label: I am running the [latest release](https://github.com/OPaperStream/PaperProxy/releases/latest).
+        - label: I am running the [latest release](https://github.com/LucasTHCRR/PaperProxy/releases/latest).
           required: true
         - label: I searched the issues and this has not been reported yet.
           required: true
-        - label: For a BungeeCord plugin, I checked it with the [Plugin Checker](https://opaperstream.github.io/PaperProxy/).
+        - label: For a BungeeCord plugin, I checked it with the [Plugin Checker](https://lucasthcrr.github.io/PaperProxy/).
           required: false

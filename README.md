@@ -10,9 +10,9 @@ plugins** side by side on one proxy, and fixes the things that annoy server owne
 Velocity and Waterfall today.
 
 **Will my plugins work?** Check them with the
-[PaperProxy Plugin Checker](https://opaperstream.github.io/PaperProxy/) (runs in your browser,
+[PaperProxy Plugin Checker](https://lucasthcrr.github.io/PaperProxy/) (runs in your browser,
 nothing is uploaded). Which plugins were tested, and how thoroughly, is listed under
-[Tested Plugins](https://github.com/OPaperStream/PaperProxy/wiki/Tested-Plugins).
+[Tested Plugins](https://github.com/LucasTHCRR/PaperProxy/wiki/Tested-Plugins).
 
 **Status: first release.** Everything below is implemented and tested on a test network,
 also with real clients. It is not yet proven on large production networks, so please report
@@ -43,7 +43,7 @@ Velocity's speed and security and still use the plugins you already have.
   cache, `/alert`, `/find`, ViaVersion install and per-server version rules.
 - **Small and safe updates.** A 2 MB jar that checks every library it downloads, update
   notices, and an optional auto-updater that only installs signed releases.
-- **Check first.** The [Plugin Checker](https://opaperstream.github.io/PaperProxy/) tells you
+- **Check first.** The [Plugin Checker](https://lucasthcrr.github.io/PaperProxy/) tells you
   before you switch which of your plugins will work.
 
 ## Features
@@ -82,7 +82,7 @@ old-pvp = "paperguard"
 **PaperGuard** is signed, replay-proof forwarding for servers that cannot use modern forwarding.
 Every login is signed with HMAC-SHA256 over all player data, the target server name, a timestamp
 and a one-time nonce, using a key derived per server. The backend plugin
-[**PaperGuard**](https://github.com/OPaperStream/PaperGuard) (Paper 1.12.2+, Folia) verifies it and **rejects everyone when it is not configured** (fail
+[**PaperGuard**](https://github.com/LucasTHCRR/PaperGuard) (Paper 1.12.2+, Folia) verifies it and **rejects everyone when it is not configured** (fail
 closed). Replayed, expired, modified or foreign logins are rejected; this is covered by attack
 tests and shared test vectors. PaperGuard has its own repository with the protocol spec, so
 other proxies can support it too. It was called PaperProxy-Bridge before.
@@ -247,7 +247,7 @@ Requires Java 25 (same as current Velocity).
 - Proxy: `proxy/build/libs/paperproxy-<version>.jar` (about 2 MB). On first start it downloads
   its libraries into `libraries/` and checks every file against its SHA-256.
 - Offline variant with everything inside: `proxy/build/libs/paperproxy-<version>-full.jar`
-- Backend plugin: see [PaperGuard](https://github.com/OPaperStream/PaperGuard)
+- Backend plugin: see [PaperGuard](https://github.com/LucasTHCRR/PaperGuard)
 
 ## Pterodactyl
 

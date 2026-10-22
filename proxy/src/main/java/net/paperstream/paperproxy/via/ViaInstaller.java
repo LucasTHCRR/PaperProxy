@@ -154,7 +154,7 @@ public final class ViaInstaller {
     final String url = String.format(Locale.ROOT, API, project,
         URLEncoder.encode("[\"velocity\"]", StandardCharsets.UTF_8));
     final HttpResponse<String> response = http.send(HttpRequest.newBuilder(URI.create(url))
-        .header("User-Agent", "OPaperStream/PaperProxy (https://github.com/OPaperStream/PaperProxy)")
+        .header("User-Agent", "LucasTHCRR/PaperProxy (https://github.com/LucasTHCRR/PaperProxy)")
         .timeout(Duration.ofSeconds(20)).build(), HttpResponse.BodyHandlers.ofString());
     if (response.statusCode() != 200) {
       throw new IOException("Modrinth answered " + response.statusCode());
@@ -171,7 +171,7 @@ public final class ViaInstaller {
 
   private byte[] download(final String url) throws IOException, InterruptedException {
     final HttpResponse<byte[]> response = http.send(HttpRequest.newBuilder(URI.create(url))
-        .header("User-Agent", "OPaperStream/PaperProxy").timeout(Duration.ofMinutes(2)).build(),
+        .header("User-Agent", "LucasTHCRR/PaperProxy").timeout(Duration.ofMinutes(2)).build(),
         HttpResponse.BodyHandlers.ofByteArray());
     if (response.statusCode() != 200) {
       throw new IOException("Download failed with " + response.statusCode());

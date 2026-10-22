@@ -4,8 +4,8 @@ contact_links:
     url: https://dc.gg/paperstream
     about: Questions, setup help and quick feedback.
   - name: Report a security problem
-    url: https://github.com/OPaperStream/PaperProxy/blob/main/SECURITY.md
+    url: https://github.com/LucasTHCRR/PaperProxy/blob/main/SECURITY.md
     about: Please do not open public issues for security problems.
   - name: Tested plugins
-    url: https://github.com/OPaperStream/PaperProxy/wiki/Tested-Plugins
+    url: https://github.com/LucasTHCRR/PaperProxy/wiki/Tested-Plugins
     about: Which BungeeCord and Velocity plugins were tested, and how thoroughly.

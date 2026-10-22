@@ -40,7 +40,7 @@ body:
       value: |
         Before submitting this request, please ensure the following:
 
-        1. You are running the [latest release](https://github.com/OPaperStream/PaperProxy/releases/latest) of PaperProxy.
+        1. You are running the [latest release](https://github.com/LucasTHCRR/PaperProxy/releases/latest) of PaperProxy.
         2. You searched for and ensured there isn't already an open issue regarding this.
         3. The feature belongs on the proxy and not on the backend server.
 

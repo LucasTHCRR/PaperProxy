@@ -5,7 +5,7 @@ apk add --no-cache curl jq >/dev/null
 mkdir -p /mnt/server
 cd /mnt/server || exit 1
 
-API="https://api.github.com/repos/OPaperStream/PaperProxy/releases"
+API="https://api.github.com/repos/LucasTHCRR/PaperProxy/releases"
 RELEASE=/tmp/paperproxy-release.json
 # Kept in a file: release notes contain escapes that "echo" would break in some shells.
 if [ -z "${PAPERPROXY_VERSION}" ] || [ "${PAPERPROXY_VERSION}" = "latest" ]; then
