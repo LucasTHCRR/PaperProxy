@@ -263,7 +263,7 @@ They can be disabled in `plugins/bStats/config.txt`.
 
 ## Community
 
-Questions and feedback: [Discord](https://dc.gg/paperstream)
+Questions and feedback: [Discord](https://dc.gg/paperstream) or [support@paperstream.dev](mailto:support@paperstream.dev)
 
 Mirror: [Codeberg](https://codeberg.org/LucasTHCR/PaperProxy)
 
