@@ -139,8 +139,9 @@ public final class BungeeImport {
       }
       final Object motd = listener.get("motd");
       if (motd != null) {
-        final String mini = MiniMessage.miniMessage()
-            .serialize(LEGACY.deserialize(String.valueOf(motd).replace('\u00a7', '&')));
+        final String legacy = String.valueOf(motd).replace(LegacyComponentSerializer.SECTION_CHAR,
+            LegacyComponentSerializer.AMPERSAND_CHAR);
+        final String mini = MiniMessage.miniMessage().serialize(LEGACY.deserialize(legacy));
         config.set("motd", mini);
         report.add("motd = " + mini);
       }
