@@ -1,0 +1,5 @@
+name: ReloadProbeBungee
+main: net.paperstream.reloadprobe.ReloadProbeBungee
+version: 1.0.0
+author: LucasTHCR
+description: Shows leftover tasks and duplicate listeners after a plugin reload

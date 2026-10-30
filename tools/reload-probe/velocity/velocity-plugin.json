@@ -1,0 +1,1 @@
+{"id":"reloadprobe","name":"ReloadProbe","version":"1.0.0","description":"Shows leftover tasks and duplicate listeners after a plugin reload","authors":["LucasTHCR"],"dependencies":[],"main":"net.paperstream.reloadprobe.ReloadProbeVelocity"}
