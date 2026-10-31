@@ -150,7 +150,12 @@ public final class PluginReloader {
     final BungeeLayerHandle bungee = server.getBungeeLayer();
     if (bungee != null) {
       final Optional<String> bungeeName = bungee.findPlugin(name);
-      if (bungeeName.isPresent()) {
+      // Gleichnamiges Velocity-Plugin geht vor, ausser der Bungee-Name passt exakt
+      final VelocityPluginManager manager = (VelocityPluginManager) server.getPluginManager();
+      final boolean velocityFirst = bungeeName.isPresent() && !bungeeName.get().equals(name)
+          && manager.getPlugin(name.toLowerCase(Locale.ROOT))
+              .filter(c -> !manager.isFacade(c)).isPresent();
+      if (bungeeName.isPresent() && !velocityFirst) {
         if (isBlocked(bungeeName.get())) {
           return new Outcome(false, "paperproxy.plugin.blocked", bungeeName.get(), "");
         }

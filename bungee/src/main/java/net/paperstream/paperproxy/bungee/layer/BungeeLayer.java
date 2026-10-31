@@ -344,8 +344,10 @@ public final class BungeeLayer implements BungeeLayerHandle {
     if (velocity.getPluginManager().getPlugin(id).isPresent()) {
       id = ("bungee-" + id).substring(0, Math.min(64, id.length() + 7));
     }
-    pluginManagerV().registerPlugin(container(id, description.getName(),
-        description.getVersion(), description.getDescription(), plugin));
+    pluginManagerV().registerFacade(container(id, description.getName(),
+        description.getVersion(), description.getDescription(), plugin),
+        newId -> container(newId, description.getName(), description.getVersion(),
+            description.getDescription(), plugin));
   }
 
   private VelocityPluginManager pluginManagerV() {

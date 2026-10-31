@@ -67,6 +67,8 @@ public class VelocityPluginManager implements PluginManager {
   private final Map<String, PluginContainer> pluginsById = new LinkedHashMap<>();
   private final Map<Object, PluginContainer> pluginInstances = new IdentityHashMap<>();
   private final Set<PluginContainer> plugins = new LinkedHashSet<>();
+  private final Map<PluginContainer, java.util.function.Function<String, PluginContainer>> facades =
+      new IdentityHashMap<>();
   private final VelocityServer server;
 
   public VelocityPluginManager(VelocityServer server) {
@@ -87,12 +89,36 @@ public class VelocityPluginManager implements PluginManager {
   }
 
   /**
+   * PaperProxy: registers a container that stands in for a BungeeCord plugin. If a real
+   * Velocity plugin with the same ID is loaded later, the stand-in is moved to another ID.
+   *
+   * @param plugin the stand-in container
+   * @param rename creates the same container under a new ID
+   */
+  public void registerFacade(PluginContainer plugin,
+                             java.util.function.Function<String, PluginContainer> rename) {
+    registerPlugin(plugin);
+    facades.put(plugin, rename);
+  }
+
+  /**
+   * PaperProxy: whether the container only stands in for a BungeeCord plugin.
+   *
+   * @param plugin the container
+   * @return true for a BungeeCord stand-in
+   */
+  public boolean isFacade(PluginContainer plugin) {
+    return facades.containsKey(plugin);
+  }
+
+  /**
    * PaperProxy: removes a plugin from the registry when it is unloaded at runtime.
    *
    * @param plugin the plugin
    */
   public void unregisterPlugin(PluginContainer plugin) {
     plugins.remove(plugin);
+    facades.remove(plugin);
     pluginsById.values().removeIf(registered -> registered == plugin);
     pluginInstances.values().removeIf(registered -> registered == plugin);
   }
@@ -107,6 +133,17 @@ public class VelocityPluginManager implements PluginManager {
   public PluginContainer loadPlugin(Path jar) throws Exception {
     JavaPluginLoader loader = new JavaPluginLoader(server, jar.getParent());
     PluginDescription candidate = loader.loadCandidate(jar);
+    PluginContainer holder = pluginsById.get(candidate.getId());
+    if (holder != null && facades.containsKey(holder)) {
+      // Bungee-Platzhalter hat die ID nach einem Entladen uebernommen, er weicht aus
+      String id = candidate.getId();
+      String moved = ("bungee-" + id).substring(0, Math.min(64, id.length() + 7));
+      if (!pluginsById.containsKey(moved)) {
+        java.util.function.Function<String, PluginContainer> rename = facades.get(holder);
+        unregisterPlugin(holder);
+        registerFacade(rename.apply(moved), rename);
+      }
+    }
     if (getPlugin(candidate.getId()).isPresent()) {
       throw new IllegalStateException("A plugin with the ID " + candidate.getId()
           + " is already loaded");
