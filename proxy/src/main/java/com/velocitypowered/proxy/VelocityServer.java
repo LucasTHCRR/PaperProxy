@@ -649,7 +649,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       serverLinks.load();
     }
 
-    ipAttemptLimiter = Ratelimiters.createWithMilliseconds(configuration.getLoginRatelimit());
+    ipAttemptLimiter = Ratelimiters.createIpAttemptLimiter(configuration.getLoginRatelimit());
     commandRateLimiter = Ratelimiters.createWithMilliseconds(configuration.getCommandRatelimit());
     tabCompleteRateLimiter = Ratelimiters.createWithMilliseconds(configuration.getTabCompleteRatelimit());
     loadPlugins();
@@ -948,7 +948,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     }
 
     commandManager.setAnnounceProxyCommands(newConfiguration.isAnnounceProxyCommands());
-    ipAttemptLimiter = Ratelimiters.createWithMilliseconds(newConfiguration.getLoginRatelimit());
+    ipAttemptLimiter = Ratelimiters.createIpAttemptLimiter(newConfiguration.getLoginRatelimit());
     eventManager.fireAndForget(new ProxyReloadEvent());
     return true;
   }
