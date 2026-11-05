@@ -446,6 +446,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return this.advanced.isAcceptTransfers();
   }
 
+  public boolean isClientOnlineModeRequiresMatchingUuid() {
+    return this.advanced.isClientOnlineModeRequiresMatchingUuid();
+  }
+
   public boolean isForceKeyAuthentication() {
     return forceKeyAuthentication;
   }
@@ -780,6 +784,8 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private boolean acceptTransfers = false;
     @Expose
+    private boolean clientOnlineModeRequiresMatchingUuid = false;
+    @Expose
     private boolean enableReusePort = false;
     @Expose
     private int commandRateLimit = 50;
@@ -816,6 +822,8 @@ public class VelocityConfiguration implements ProxyConfig {
         this.logCommandExecutions = config.getOrElse("log-command-executions", false);
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.acceptTransfers = config.getOrElse("accepts-transfers", false);
+        this.clientOnlineModeRequiresMatchingUuid = config.getOrElse(
+            "client-online-mode-requires-matching-uuid", false);
         this.enableReusePort = config.getOrElse("enable-reuse-port", false);
         this.commandRateLimit = config.getIntOrElse("command-rate-limit", 25);
         this.forwardCommandsIfRateLimited = config.getOrElse("forward-commands-if-rate-limited", true);
@@ -885,6 +893,10 @@ public class VelocityConfiguration implements ProxyConfig {
       return this.acceptTransfers;
     }
 
+    public boolean isClientOnlineModeRequiresMatchingUuid() {
+      return this.clientOnlineModeRequiresMatchingUuid;
+    }
+
     public boolean isEnableReusePort() {
       return enableReusePort;
     }
@@ -926,6 +938,7 @@ public class VelocityConfiguration implements ProxyConfig {
           + ", logCommandExecutions=" + logCommandExecutions
           + ", logPlayerConnections=" + logPlayerConnections
           + ", acceptTransfers=" + acceptTransfers
+          + ", clientOnlineModeRequiresMatchingUuid=" + clientOnlineModeRequiresMatchingUuid
           + ", enableReusePort=" + enableReusePort
           + '}';
     }
