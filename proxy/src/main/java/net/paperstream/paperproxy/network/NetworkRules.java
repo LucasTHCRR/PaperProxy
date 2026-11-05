@@ -50,6 +50,8 @@ public final class NetworkRules {
 
   /** Permission to join and switch during maintenance. */
   public static final String MAINTENANCE_BYPASS = "paperproxy.maintenance.bypass";
+  /** Permission to join when the network is full. */
+  public static final String LIMIT_BYPASS = "paperproxy.limit.bypass";
 
   private final VelocityServer server;
 
@@ -67,17 +69,27 @@ public final class NetworkRules {
   }
 
   /**
-   * Global maintenance.
+   * Global maintenance and the player limit.
    *
    * @param event the event
    */
   @Subscribe(order = PostOrder.EARLY)
   public void onLogin(final LoginEvent event) {
-    if (!values().maintenance() || mayBypass(event.getPlayer())) {
+    if (!event.getResult().isAllowed()) {
       return;
     }
-    event.setResult(ResultedEvent.ComponentResult.denied(
-        Component.translatable("paperproxy.maintenance.kick")));
+    final Player player = event.getPlayer();
+    if (values().maintenance() && !mayBypass(player)) {
+      event.setResult(ResultedEvent.ComponentResult.denied(
+          Component.translatable("paperproxy.maintenance.kick")));
+      return;
+    }
+    // der Spieler zaehlt hier noch nicht mit
+    final int max = values().maxPlayers();
+    if (max > 0 && server.getPlayerCount() >= max && !player.hasPermission(LIMIT_BYPASS)) {
+      event.setResult(ResultedEvent.ComponentResult.denied(Component.translatable(
+          "paperproxy.limit.full", Argument.string("max", String.valueOf(max)))));
+    }
   }
 
   /**
@@ -195,13 +207,17 @@ public final class NetworkRules {
   }
 
   /**
-   * Shows maintenance in the server list.
+   * Shows maintenance and the player limit in the server list.
    *
    * @param event the event
    */
   @Subscribe(order = PostOrder.LATE)
   public void onPing(final ProxyPingEvent event) {
-    if (!values().maintenance()) {
+    final PaperProxyConfig.Values values = values();
+    if (values.maxPlayers() > 0 && values.maxPlayersInPing()) {
+      event.setPing(event.getPing().asBuilder().maximumPlayers(values.maxPlayers()).build());
+    }
+    if (!values.maintenance()) {
       return;
     }
     final ServerPing ping = event.getPing();

@@ -85,6 +85,8 @@ paperproxy:
     status: "{prefix}<gray>Network maintenance: <white>{state}</white>, servers in maintenance: <white>{servers}"
     enabled: "{prefix}<yellow>Maintenance enabled for <white>{target}</white>."
     disabled: "{prefix}<green>Maintenance disabled for <white>{target}</white>."
+  limit:
+    full: "<red>The network is full.</red>\n<gray>All {max} slots are taken, please try again later."
   versions:
     denied: "{prefix}<red>{server} only supports Minecraft {versions}. You are using {client_version}."
   health:

@@ -129,6 +129,7 @@ set `settings.bungeecord: true` in its `spigot.yml`.
 - **`/send` for groups and servers**: `/send all lobby`, `/send server game-1 lobby`
 - **Health checks**: offline servers are skipped and refused with a message, staff is notified
 - **Maintenance** for the whole network or single servers, with whitelist
+- **Player limit** for the whole network (`limits.max-players`), shown in the server list
 - **Ping cache** against server list floods
 - `/alert`, `/find`, `/ip`
 - **Update notifications** from GitHub releases and an optional, signature-verified
@@ -155,7 +156,8 @@ set `settings.bungeecord: true` in its `spigot.yml`.
 | `/ban`, `/unban`, `/banlist`, `/mute`, `/unmute`, `/kick` | `paperproxy.command.ban`, `.mute`, `.kick` (only with `punish.enabled`) |
 | `/paperproxy restart <seconds> [reason]`, `restart cancel` | `paperproxy.command.restart` |
 
-Other permissions: `paperproxy.maintenance.bypass`, `paperproxy.notify.health`,
+Other permissions: `paperproxy.maintenance.bypass`, `paperproxy.limit.bypass` (join a full
+network), `paperproxy.notify.health`,
 `paperproxy.update` (update notice on join), `paperproxy.queue.bypass` (join full servers),
 `paperproxy.queue.priority.<0-100>`, `paperproxy.antibot.bypass` (accounts per IP limit),
 `paperproxy.tabcomplete.bypass` (sees hidden commands), `paperproxy.punish.exempt`,

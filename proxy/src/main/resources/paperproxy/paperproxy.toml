@@ -38,6 +38,13 @@ enabled = false
 servers = []
 whitelist = []
 
+[limits]
+# Most players the whole network lets in, 0 = no limit (show-max-players in velocity.toml only
+# changes the number in the server list). Players with paperproxy.limit.bypass can always join.
+max-players = 0
+# Show max-players as the maximum in the server list. Only with max-players above 0.
+show-in-server-list = true
+
 [groups]
 # Servers that act as one. Players are sent to the member with the fewest players; full or
 # offline members are skipped. Use a member name in velocity.toml (try, forced-hosts) and the
