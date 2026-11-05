@@ -144,6 +144,7 @@ set `settings.bungeecord: true` in its `spigot.yml`.
 | `/pp reload` | `paperproxy.command.reload` |
 | `/pp servers` | `paperproxy.command.servers` |
 | `/pp maintenance [on\|off] [server]` | `paperproxy.command.maintenance` |
+| `/pp limit [players\|off]` | `paperproxy.command.limit` |
 | `/pp plugin list\|reload\|unload\|load` | `paperproxy.command.plugin` |
 | `/pp via install\|update` | `paperproxy.command.via` |
 | `/pp update` | `paperproxy.update` |

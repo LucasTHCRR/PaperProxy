@@ -75,6 +75,8 @@ paperproxy:
     disabled: "{prefix}<green>Wartung deaktiviert für <white>{target}</white>."
   limit:
     full: "<red>Das Netzwerk ist voll.</red>\n<gray>Alle {max} Plätze sind belegt, versuch es später noch einmal."
+    status: "{prefix}<gray>Spielerlimit: <white>{limit}</white>, online: <white>{online}"
+    set: "{prefix}<green>Spielerlimit auf <white>{limit}</white> gesetzt."
   versions:
     denied: "{prefix}<red>{server} unterstützt nur Minecraft {versions}. Du nutzt {client_version}."
   health:

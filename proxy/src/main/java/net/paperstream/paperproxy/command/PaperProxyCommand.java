@@ -81,6 +81,16 @@ public final class PaperProxyCommand {
                     .suggests(PaperProxyCommand.serverSuggestions(server))
                     .executes(ctx -> maintenance(server, ctx,
                         StringArgumentType.getString(ctx, "server"), false)))))
+        .then(BrigadierCommand.literalArgumentBuilder("limit")
+            .requires(source -> source.getPermissionValue("paperproxy.command.limit")
+                == Tristate.TRUE)
+            .executes(ctx -> limitStatus(server, ctx))
+            .then(BrigadierCommand.literalArgumentBuilder("off")
+                .executes(ctx -> limit(server, ctx, 0)))
+            .then(BrigadierCommand.requiredArgumentBuilder("players",
+                    IntegerArgumentType.integer(1, 1_000_000))
+                .executes(ctx -> limit(server, ctx,
+                    IntegerArgumentType.getInteger(ctx, "players")))))
         .then(PluginCommand.create(server))
         .then(LinkCommand.create(server))
         .then(BrigadierCommand.literalArgumentBuilder("via")
@@ -259,6 +269,30 @@ public final class PaperProxyCommand {
     ctx.getSource().sendMessage(Component.translatable(enabled
             ? "paperproxy.maintenance.enabled" : "paperproxy.maintenance.disabled",
         Argument.string("target", target == null ? "network" : target)));
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int limitStatus(final VelocityServer server,
+                                 final CommandContext<CommandSource> ctx) {
+    final int max = server.getPaperProxyConfig().values().maxPlayers();
+    ctx.getSource().sendMessage(Component.translatable("paperproxy.limit.status",
+        Argument.string("limit", max > 0 ? String.valueOf(max) : "off"),
+        Argument.string("online", String.valueOf(server.getPlayerCount()))));
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int limit(final VelocityServer server, final CommandContext<CommandSource> ctx,
+                           final int max) {
+    try {
+      server.getPaperProxyConfig().setMaxPlayers(max);
+    } catch (final java.io.IOException e) {
+      ctx.getSource().sendMessage(Component.text("Unable to save paperproxy.toml: "
+          + e.getMessage(), NamedTextColor.RED));
+      return 0;
+    }
+    server.getPingCache().clear();
+    ctx.getSource().sendMessage(Component.translatable("paperproxy.limit.set",
+        Argument.string("limit", max > 0 ? String.valueOf(max) : "off")));
     return Command.SINGLE_SUCCESS;
   }
 

@@ -322,6 +322,22 @@ public final class PaperProxyConfig {
     load();
   }
 
+  /**
+   * Sets the network player limit and saves the file.
+   *
+   * @param max the limit, 0 = no limit
+   * @throws IOException if the file cannot be written
+   */
+  public synchronized void setMaxPlayers(final int max) throws IOException {
+    try (CommentedFileConfig config = CommentedFileConfig.builder(file).preserveInsertionOrder().sync()
+        .build()) {
+      config.load();
+      config.set("limits.max-players", max);
+      config.save();
+    }
+    load();
+  }
+
   static Values parse(final Config config, final List<String> errors) {
     final Values d = Values.defaults();
 
