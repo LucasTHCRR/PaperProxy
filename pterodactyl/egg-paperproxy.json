@@ -6,7 +6,7 @@
     },
     "exported_at": "2026-10-03T17:00:00+02:00",
     "name": "PaperProxy",
-    "author": "330454039+LucasTHCRR@users.noreply.github.com",
+    "author": "business@paperstream.dev",
     "description": "PaperProxy: a Velocity fork that runs Velocity and BungeeCord plugins side by side, with per-server forwarding, PaperGuard, messages.yml and plugin reload. Not an official Paper project. Made by LucasTHCR.",
     "features": null,
     "docker_images": {
