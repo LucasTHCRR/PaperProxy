@@ -46,6 +46,16 @@ max-players = 0
 # Show max-players as the maximum in the server list. Only with max-players above 0.
 show-in-server-list = true
 
+[tablist]
+# Header and footer of the player list (Tab). Off by default, so plugins like TAB keep working.
+# MiniMessage and legacy color codes work. Placeholders: {online}, {max} (the limit above, or
+# show-max-players), {network_online} (with network sync), {server}, {ping}, {player}.
+enabled = false
+header = "\n<aqua><bold>PaperProxy</bold></aqua>\n<gray>{online}/{max} players online\n"
+footer = "\n<gray>{server} <dark_gray>|</dark_gray> {ping} ms\n"
+# Seconds between updates. Lines are only sent when they changed.
+update-seconds = 2
+
 [groups]
 # Servers that act as one. Players are sent to the member with the fewest players; full or
 # offline members are skipped. Use a member name in velocity.toml (try, forced-hosts) and the

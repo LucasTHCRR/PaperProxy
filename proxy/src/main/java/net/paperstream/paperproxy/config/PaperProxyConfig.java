@@ -89,6 +89,7 @@ public final class PaperProxyConfig {
    * @param paperStreamLink whether PaperStream backends may pair and link
    * @param maxPlayers most players on the network, 0 = no limit
    * @param maxPlayersInPing whether the server list shows that limit as the maximum
+   * @param tabList header and footer of the player list
    */
   public record Values(Map<String, PlayerInfoForwarding> forwarding, int paperGuardMaxAgeSeconds,
                        Map<String, VersionRange> versions, boolean healthCheck,
@@ -103,7 +104,7 @@ public final class PaperProxyConfig {
                        Sync sync, Set<String> hiddenCommands, String queryServer,
                        int queryPort, Discord discord, Restart restart, Party party,
                        boolean punish, Limbo limbo, boolean paperStreamLink,
-                       int maxPlayers, boolean maxPlayersInPing) {
+                       int maxPlayers, boolean maxPlayersInPing, TabList tabList) {
 
     static Values defaults() {
       return new Values(Map.of(), 10, Map.of(), true, 10, "paperproxy.notify.health", false,
@@ -112,7 +113,24 @@ public final class PaperProxyConfig {
           true, "auto", false, false, Map.of(), Queue.defaults(), "",
           List.of("hub", "lobby"), AntiBot.defaults(), Metrics.defaults(), "",
           Sync.defaults(), Set.of(), "", 0, Discord.defaults(), Restart.defaults(),
-          Party.defaults(), false, Limbo.defaults(), false, 0, true);
+          Party.defaults(), false, Limbo.defaults(), false, 0, true, TabList.defaults());
+    }
+  }
+
+  /**
+   * Header and footer of the player list.
+   *
+   * @param enabled whether the proxy sets them
+   * @param header the header, MiniMessage or legacy codes
+   * @param footer the footer, MiniMessage or legacy codes
+   * @param updateSeconds seconds between updates
+   */
+  public record TabList(boolean enabled, String header, String footer, int updateSeconds) {
+
+    static TabList defaults() {
+      return new TabList(false,
+          "\n<aqua><bold>PaperProxy</bold></aqua>\n<gray>{online}/{max} players online\n",
+          "\n<gray>{server} <dark_gray>|</dark_gray> {ping} ms\n", 2);
     }
   }
 
@@ -479,7 +497,12 @@ public final class PaperProxyConfig {
                 : stringList(config.get("limbo.kick-messages"))),
         bool(config, "paperstream-link.enabled", d.paperStreamLink(), errors),
         integer(config, "limits.max-players", d.maxPlayers(), 0, 1_000_000, errors),
-        bool(config, "limits.show-in-server-list", d.maxPlayersInPing(), errors));
+        bool(config, "limits.show-in-server-list", d.maxPlayersInPing(), errors),
+        new TabList(bool(config, "tablist.enabled", d.tabList().enabled(), errors),
+            string(config, "tablist.header", d.tabList().header(), errors),
+            string(config, "tablist.footer", d.tabList().footer(), errors),
+            integer(config, "tablist.update-seconds", d.tabList().updateSeconds(), 1, 60,
+                errors)));
   }
 
   /**

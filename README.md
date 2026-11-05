@@ -132,6 +132,7 @@ set `settings.bungeecord: true` in its `spigot.yml`.
 - **Health checks**: offline servers are skipped and refused with a message, staff is notified
 - **Maintenance** for the whole network or single servers, with whitelist
 - **Player limit** for the whole network (`limits.max-players`), shown in the server list
+- **Tab list header and footer** with players, limit, server and ping (`[tablist]`, off by default)
 - **Ping cache** against server list floods
 - `/alert`, `/find`, `/ip`
 - **Update notifications** from GitHub releases and an optional, signature-verified

@@ -135,6 +135,7 @@ import net.paperstream.paperproxy.network.QueryPassthrough;
 import net.paperstream.paperproxy.network.RestartScheduler;
 import net.paperstream.paperproxy.network.ServerGroups;
 import net.paperstream.paperproxy.network.ServerQueue;
+import net.paperstream.paperproxy.network.TabHeaderFooter;
 import net.paperstream.paperproxy.party.Parties;
 import net.paperstream.paperproxy.plugin.PluginReloader;
 import net.paperstream.paperproxy.plugin.UpdateFolder;
@@ -230,6 +231,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   private final Parties parties = new Parties(this);
   private final ProxyStats proxyStats = new ProxyStats();
   private final Limbo limbo = new Limbo(this);
+  private final TabHeaderFooter tabHeaderFooter = new TabHeaderFooter(this);
   private final ServerLinks serverLinks = new ServerLinks(this, Path.of(""));
   private final PaperProxyApi paperProxyApi = new PaperProxyApi(this);
   private volatile boolean listening;
@@ -625,6 +627,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     limbo.start();
     punishments.start();
     restartScheduler.start();
+    eventManager.register(VelocityVirtualPlugin.INSTANCE, tabHeaderFooter);
+    tabHeaderFooter.start();
     eventManager.register(VelocityVirtualPlugin.INSTANCE, motd);
     eventManager.register(VelocityVirtualPlugin.INSTANCE, updateChecker);
     updateChecker.start();
