@@ -17,6 +17,8 @@
 
 package net.paperstream.paperproxy.network;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpServer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -27,6 +29,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
@@ -78,11 +81,22 @@ public final class MetricsEndpoint {
           out.write(body);
         }
       });
+      created.createContext("/status", exchange -> {
+        final byte[] body = status().getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
+        // Statusseiten auf Webseiten duerfen das direkt abfragen
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.sendResponseHeaders(200, body.length);
+        try (OutputStream out = exchange.getResponseBody()) {
+          out.write(body);
+        }
+      });
       created.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
       created.start();
       http = created;
       running = settings;
-      logger.info("Metrics available at http://{}:{}/metrics", settings.bind(), settings.port());
+      logger.info("Metrics available at http://{}:{}/metrics, status as JSON at /status",
+          settings.bind(), settings.port());
     } catch (final IOException e) {
       logger.error("Unable to start the metrics endpoint on {}:{}: {}", settings.bind(),
           settings.port(), e.getMessage());
@@ -163,6 +177,34 @@ public final class MetricsEndpoint {
     gauge(out, "paperproxy_uptime_seconds", "Seconds since the proxy started",
         ManagementFactory.getRuntimeMXBean().getUptime() / 1000);
     return out.toString();
+  }
+
+  String status() {
+    final PaperProxyConfig.Values values = server.getPaperProxyConfig().values();
+    final JsonObject root = new JsonObject();
+    root.addProperty("online", server.getPlayerCount());
+    root.addProperty("max", values.maxPlayers() > 0 ? values.maxPlayers()
+        : server.getConfiguration().getShowMaxPlayers());
+    if (server.getNetworkSync().connected()) {
+      root.addProperty("network_online", server.getNetworkSync().networkPlayerCount());
+    }
+    root.addProperty("maintenance", values.maintenance());
+    final JsonArray servers = new JsonArray();
+    for (final RegisteredServer registered : server.getAllServers()) {
+      final String name = registered.getServerInfo().getName();
+      final JsonObject entry = new JsonObject();
+      entry.addProperty("name", name);
+      entry.addProperty("online", server.getHealthChecker().isOnline(name));
+      entry.addProperty("players", registered.getPlayersConnected().size());
+      entry.addProperty("queue", server.getServerQueue().size(name));
+      entry.addProperty("maintenance",
+          values.maintenanceServers().contains(name.toLowerCase(Locale.ROOT)));
+      servers.add(entry);
+    }
+    root.add("servers", servers);
+    root.addProperty("version", server.getVersion().getVersion());
+    root.addProperty("uptime_seconds", ManagementFactory.getRuntimeMXBean().getUptime() / 1000);
+    return root.toString();
   }
 
   private static void counter(final StringBuilder out, final String name, final String help,

@@ -89,6 +89,8 @@ require-ping = "attack"
 
 [metrics]
 # Prometheus endpoint with players, servers, queues and memory, at http://<bind>:<port>/metrics.
+# The same port serves /status: players, limit, maintenance and every server as JSON, for
+# status pages and bots (no player names). Keep bind on 127.0.0.1 unless you want it public.
 enabled = false
 bind = "127.0.0.1"
 port = 9225

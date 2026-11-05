@@ -115,6 +115,8 @@ set `settings.bungeecord: true` in its `spigot.yml`.
 - **Prometheus metrics** at `/metrics` (players, servers, queues, logins, connect times, kicks,
   client versions, memory), off by default, with a ready
   [Grafana dashboard](docs/grafana/paperproxy-dashboard.json)
+- **Status as JSON** at `/status` on the same port: players, limit, maintenance and every server,
+  for status pages and bots
 - **Restart without kicks**: `shutdown.transfer-to` hands players to another proxy (1.20.5+)
 - **Update folder**: put new jars into `plugins/update`, they replace the old version (same file
   name or same plugin id) on the next start
