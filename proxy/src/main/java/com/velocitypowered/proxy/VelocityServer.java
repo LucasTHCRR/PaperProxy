@@ -548,6 +548,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   void start() {
     PaperProxyBranding.printBanner(logger, getVersion());
     PaperProxyProvider.set(paperProxyApi);
+    // Neustarts in der Tagesdatei finden
+    logger.info("==================== Proxy start ====================");
     logger.info("Booting up {} {}...", getVersion().getName(), PaperProxyBranding.version());
     console.setupStreams();
     pluginManager.registerPlugin(this.createVirtualPlugin());

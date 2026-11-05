@@ -36,8 +36,17 @@
         pattern="[%d{HH:mm:ss}] [%t/%level] [%logger]: %stripAnsi{%msg}%n"/>
       <Policies>
         <TimeBasedTriggeringPolicy/>
-        <OnStartupTriggeringPolicy/>
+        <!-- PaperProxy: eine Datei pro Tag, Neustarts haengen an. -Dpaperproxy.log.rollOnStartBytes=1 = wieder eine Datei pro Start -->
+        <OnStartupTriggeringPolicy minSize="${sys:paperproxy.log.rollOnStartBytes:-9223372036854775807}"/>
+        <SizeBasedTriggeringPolicy size="${sys:paperproxy.log.maxSize:-100 MB}"/>
       </Policies>
+      <DefaultRolloverStrategy max="1000">
+        <!-- PaperProxy: gepackte Logs nach 30 Tagen loeschen, -Dpaperproxy.log.keepDays aendert das -->
+        <Delete basePath="logs" maxDepth="1">
+          <IfFileName glob="*.log.gz"/>
+          <IfLastModified age="${sys:paperproxy.log.keepDays:-30}d"/>
+        </Delete>
+      </DefaultRolloverStrategy>
     </RollingRandomAccessFile>
   </Appenders>
 
