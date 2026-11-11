@@ -93,6 +93,7 @@ paperproxy:
     timeout: "{prefix}<red>Du hast zu lange gewartet und die Warteschlange für {server} verlassen."
     full: "{prefix}<red>{server} ist gerade voll."
     rejoin: "{prefix}<green>{server} ist wieder online. Du wirst zurückgeschickt..."
+    refused: "{prefix}<red>{server} hat dich nicht reingelassen. Du hast die Warteschlange verlassen."
   hub:
     already: "{prefix}<gray>Du bist schon da."
     no-server: "{prefix}<red>Gerade ist kein Server verfügbar."
