@@ -105,6 +105,7 @@ paperproxy:
     timeout: "{prefix}<red>You waited too long and left the queue for {server}."
     full: "{prefix}<red>{server} is full right now."
     rejoin: "{prefix}<green>{server} is back online. Sending you back..."
+    refused: "{prefix}<red>{server} did not let you in. You left the queue."
   hub:
     already: "{prefix}<gray>You are already there."
     no-server: "{prefix}<red>No server is available right now."

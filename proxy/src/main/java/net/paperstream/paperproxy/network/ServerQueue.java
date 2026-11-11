@@ -67,6 +67,10 @@ public final class ServerQueue {
   /** Server name (lower case) to its waiting players, best first. Guarded by this. */
   private final Map<String, List<Entry>> queues = new HashMap<>();
   private final Map<UUID, Rejoin> rejoins = new ConcurrentHashMap<>();
+  // Fehlversuche pro Spieler: {Anzahl Ablehnungen durch den Server, naechster Versuch in ms}
+  private final Map<UUID, long[]> retries = new ConcurrentHashMap<>();
+  private static final int MAX_REFUSALS = 3;
+  private static final long RETRY_MILLIS = 5_000;
   private long counter;
   private volatile @Nullable ScheduledTask task;
   private volatile int interval;
@@ -265,6 +269,10 @@ public final class ServerQueue {
         it.remove();
         continue;
       }
+      final long[] retry = retries.get(entry.player());
+      if (retry != null && retry[1] > System.currentTimeMillis()) {
+        continue;
+      }
       if (free > 0 && server.getNetworkRules().hardProblem(player, target) == null) {
         free--;
         it.remove();
@@ -283,17 +291,36 @@ public final class ServerQueue {
   }
 
   private void connect(final Player player, final RegisteredServer target) {
-    player.sendMessage(Component.translatable("paperproxy.queue.connecting",
-        Argument.string("server", target.getServerInfo().getName())));
+    final UUID id = player.getUniqueId();
+    if (!retries.containsKey(id)) {
+      // Only announced on the first try, retries stay quiet.
+      player.sendMessage(Component.translatable("paperproxy.queue.connecting",
+          Argument.string("server", target.getServerInfo().getName())));
+    }
     player.createConnectionRequest(target).connect().whenComplete((result, error) -> {
-      if (error != null || result == null || !result.isSuccessful()) {
-        // The server filled up or went down in the meantime: back to the front of the line.
-        final boolean already = result != null
-            && result.getStatus() == ConnectionRequestBuilder.Status.ALREADY_CONNECTED;
-        if (!already && player.isActive()) {
-          enqueue(player, target, false);
-        }
+      if (error == null && result != null && result.isSuccessful()) {
+        retries.remove(id);
+        return;
       }
+      final boolean already = result != null
+          && result.getStatus() == ConnectionRequestBuilder.Status.ALREADY_CONNECTED;
+      if (already || !player.isActive()) {
+        retries.remove(id);
+        return;
+      }
+      // The server answered and turned the player away (whitelist, ban, full): a few spaced
+      // retries, then give up instead of trying again every second.
+      final boolean refused = result != null
+          && result.getStatus() == ConnectionRequestBuilder.Status.SERVER_DISCONNECTED;
+      final long[] retry = retries.computeIfAbsent(id, k -> new long[2]);
+      if (refused && ++retry[0] >= MAX_REFUSALS) {
+        retries.remove(id);
+        player.sendMessage(Component.translatable("paperproxy.queue.refused",
+            Argument.string("server", target.getServerInfo().getName())));
+        return;
+      }
+      retry[1] = System.currentTimeMillis() + RETRY_MILLIS * Math.max(1, retry[0]);
+      enqueue(player, target, false);
     });
   }
 
@@ -334,6 +361,7 @@ public final class ServerQueue {
   public void onDisconnect(final DisconnectEvent event) {
     leave(event.getPlayer().getUniqueId());
     rejoins.remove(event.getPlayer().getUniqueId());
+    retries.remove(event.getPlayer().getUniqueId());
   }
 
   /**
